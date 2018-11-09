@@ -14,7 +14,7 @@ const connectionParams = {
   password: process.env.POSTGRES_PASSWORD
 };
 
-describe('postgremote', () => {
+describe('postgremote server', () => {
   let pool: Pool;
   let app: Application;
 
