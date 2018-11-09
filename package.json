@@ -25,6 +25,7 @@
     "@types/node": "^10.12.3",
     "@types/pg": "^7.4.11",
     "@types/sqlstring": "^2.2.0",
+    "@types/superagent": "^3.8.4",
     "@types/supertest": "^2.0.6",
     "jest": "^23.6.0",
     "prettier": "^1.15.1",
@@ -39,7 +40,8 @@
     "express": "^4.16.4",
     "jsonwebtoken": "^8.3.0",
     "pg": "^7.6.1",
-    "sqlstring": "^2.3.1"
+    "sqlstring": "^2.3.1",
+    "superagent": "^4.0.0-beta.5"
   },
   "prettier": {
     "singleQuote": true
