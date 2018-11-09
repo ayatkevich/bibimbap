@@ -372,6 +372,49 @@ describe('postgremote', () => {
     });
   });
 
+  describe('error handling', async () => {
+    beforeAll(async () => {
+      await setupTestEnvironment();
+
+      app = express();
+      app.use(cookieParser());
+      app.use(bodyParser.json());
+
+      app.post(
+        endpoint,
+        await setup({
+          defaultRole,
+          secret,
+          tokenType,
+          tokenExpiresIn
+        })
+      );
+    });
+
+    afterAll(async () => {
+      try {
+        await cleanupTestEnvironment();
+      } finally {
+        await teardown();
+      }
+    });
+
+    it(`should respond with 500 if not 403`, async () => {
+      const NonexistentTable = jsql.table('NonexistentTable', [
+        jsql.column('whatever', { type: String })
+      ]);
+
+      const { body } = await request(app)
+        .post(endpoint)
+        .send(jsql.insert(NonexistentTable, { whatever: 'jeez' }).toJSQL())
+        .expect(500);
+      expect(body.code).toMatchInlineSnapshot(`"42P01"`);
+      expect(body.message).toMatchInlineSnapshot(
+        `"relation \\"NonexistentTable\\" does not exist"`
+      );
+    });
+  });
+
   test(`no args`, async () => {
     try {
       // @ts-ignore

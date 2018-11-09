@@ -92,15 +92,16 @@ export async function setup(settings: PostgremoteSettings) {
         role = sub;
       }
       await client.query(
-        `SET search_path TO ${escapeId(settings.schema || 'public')}`
+        `set search_path to ${escapeId(settings.schema || 'public')}`
       );
-      await client.query(`SET ROLE ${escapeId(role)}`);
+      await client.query(`set role ${escapeId(role)}`);
 
       const response = await client.query(jsql(req.body as Query));
       const tokenField = response.fields.find(
         field => field.dataTypeID === tokenTypeID
       );
       let result: any[] | any = response.rows;
+
       if (tokenField) {
         const [, sub] = response.rows[0][tokenField.name].match(/^\((.*)\)$/);
         const token = jwt.sign({ sub }, settings.secret);
@@ -112,10 +113,11 @@ export async function setup(settings: PostgremoteSettings) {
         });
         result = true;
       }
+
       res.send(result);
     } catch (error) {
-      res.status(403);
-      res.send(error.message);
+      res.status(error.code === '42501' ? 403 : 500);
+      res.send({code: error.code, message: error.message});
     } finally {
       client.release();
     }

@@ -15,7 +15,7 @@ PostgreMote:
     ✔ implement server bootstrap that populates token type oid based on the provided token type name @done
     ✔ pack the whole server as an express middleware with ability to provide configuration and connection pool link @done
     ✔ guard everything up @done
-    ☐ set up error correct error handling
+    ☐ set up error handling for all of the cases that are not 42501
   ☐ implement a request method that infer select types and wrap it with Promise
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen scheme
   ☐ implement database migration tool for PostgreMote with auto code generation
