@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
-import { startup, shutdown } from './index';
+import { setup, teardown } from './index';
 import { jsql, escapeId } from './jsql';
 
 const connectionParams = {
@@ -67,7 +67,7 @@ describe('postgremote', () => {
 
       app.post(
         endpoint,
-        await startup({
+        await setup({
           defaultRole,
           secret,
           tokenType,
@@ -80,7 +80,7 @@ describe('postgremote', () => {
       try {
         await cleanupTestEnvironment();
       } finally {
-        await shutdown();
+        await teardown();
       }
     });
 
@@ -317,7 +317,7 @@ describe('postgremote', () => {
 
       app.post(
         endpoint,
-        await startup({
+        await setup({
           schema,
           defaultRole,
           secret,
@@ -330,7 +330,7 @@ describe('postgremote', () => {
     afterAll(async () => {
       await cleanupTestEnvironment();
 
-      await shutdown();
+      await teardown();
     });
 
     it('should work with different schemas', async () => {
@@ -370,5 +370,97 @@ describe('postgremote', () => {
         client.release();
       }
     });
+  });
+
+  test(`no args`, async () => {
+    try {
+      // @ts-ignore
+      await setup();
+    } catch (error) {
+      expect(error.message).toMatchInlineSnapshot(
+        `"Settings cannot be undefined"`
+      );
+    } finally {
+      await teardown();
+    }
+  });
+
+  test(`role is undefined`, async () => {
+    try {
+      // @ts-ignore
+      await setup({
+        secret: 'secret'
+      });
+    } catch (error) {
+      expect(error.message).toMatchInlineSnapshot(
+        `"Default role cannot be undefined"`
+      );
+    } finally {
+      await teardown();
+    }
+  });
+
+  test(`wrong defaultRole`, async () => {
+    try {
+      // @ts-ignore
+      await setup({
+        secret: 'secret',
+        tokenType: 'tokenType',
+        defaultRole: 'there is no such a role of course'
+      });
+    } catch (error) {
+      expect(error.message).toMatchInlineSnapshot(
+        `"Role 'there is no such a role of course' does not exist"`
+      );
+    } finally {
+      await teardown();
+    }
+  });
+
+  test(`no secret`, async () => {
+    try {
+      // @ts-ignore
+      await setup({ secret: '' });
+    } catch (error) {
+      expect(error.message).toMatchInlineSnapshot(
+        `"Secret cannot be undefined"`
+      );
+    } finally {
+      await teardown();
+    }
+  });
+
+  test(`no token type`, async () => {
+    try {
+      await setup({
+        secret: 'oops',
+        // @ts-ignore
+        defaultRole: process.env.POSTGRES_USER,
+        tokenType: ''
+      });
+    } catch (error) {
+      expect(error.message).toMatchInlineSnapshot(
+        `"Token type cannot be undefined"`
+      );
+    } finally {
+      await teardown();
+    }
+  });
+
+  test(`wrong token type`, async () => {
+    try {
+      await setup({
+        secret: 'oops',
+        // @ts-ignore
+        defaultRole: process.env.POSTGRES_USER,
+        tokenType: 'there is no such a token type'
+      });
+    } catch (error) {
+      expect(error.message).toMatchInlineSnapshot(
+        `"Token type 'there is no such a token type' does not exist"`
+      );
+    } finally {
+      await teardown();
+    }
   });
 });

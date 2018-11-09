@@ -12,7 +12,14 @@ const connectionParams = {
 };
 let pool: Pool;
 
-export async function startup(settings: {
+export class PostgremoteError extends Error {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, PostgremoteError.prototype);
+  }
+}
+
+type PostgremoteSettings = {
   /**
    * if there is no schema public scheme will be used by default
    */
@@ -21,21 +28,58 @@ export async function startup(settings: {
   secret: string;
   tokenType: string;
   tokenExpiresIn: number;
-}) {
-  pool = new Pool(connectionParams);
+};
+
+async function assertSettingsAndFetchTokenTypeID(
+  pool: Pool,
+  settings: PostgremoteSettings
+) {
+  if (!settings) {
+    throw new PostgremoteError(`Settings cannot be undefined`);
+  }
+  if (!settings.secret) {
+    throw new PostgremoteError(`Secret cannot be undefined`);
+  }
+  if (!settings.defaultRole) {
+    throw new PostgremoteError(`Default role cannot be undefined`);
+  }
+  if (!settings.tokenType) {
+    throw new PostgremoteError(`Token type cannot be undefined`);
+  }
 
   const client = await pool.connect();
-  let tokenTypeID: number;
   try {
     const {
-      rows: [{ oid }]
-    } = await client.query(`select oid from pg_type where typname = $1`, [
+      rows: [doesRoleExist]
+    } = await client.query(`select true from pg_roles where rolname=$1`, [
+      settings.defaultRole
+    ]);
+    if (!doesRoleExist) {
+      throw new PostgremoteError(
+        `Role '${settings.defaultRole}' does not exist`
+      );
+    }
+
+    const {
+      rows: [tokenRow]
+    } = await client.query(`select oid from pg_type where typname=$1`, [
       settings.tokenType
     ]);
-    tokenTypeID = oid;
+    if (!tokenRow) {
+      throw new PostgremoteError(
+        `Token type '${settings.tokenType}' does not exist`
+      );
+    }
+    return tokenRow.oid;
   } finally {
     client.release();
   }
+}
+
+export async function setup(settings: PostgremoteSettings) {
+  pool = new Pool(connectionParams);
+
+  const tokenTypeID = await assertSettingsAndFetchTokenTypeID(pool, settings);
 
   return async function postgremote(req: Request, res: Response) {
     const client = await pool.connect();
@@ -78,6 +122,6 @@ export async function startup(settings: {
   };
 }
 
-export async function shutdown() {
+export async function teardown() {
   await pool.end();
 }

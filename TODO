@@ -1,5 +1,5 @@
 Security:
-  ☐ update merge dependency
+  ✔ update merge dependency @done
   ☐ test sql injection
 
 Chores:
@@ -14,7 +14,7 @@ PostgreMote:
     ✔ make sure user can't work with postgres internal data structures except those that explicitly allowed to use @done
     ✔ implement server bootstrap that populates token type oid based on the provided token type name @done
     ✔ pack the whole server as an express middleware with ability to provide configuration and connection pool link @done
-    ☐ guard everything up
+    ✔ guard everything up @done
     ☐ set up error correct error handling
   ☐ implement a request method that infer select types and wrap it with Promise
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen scheme
