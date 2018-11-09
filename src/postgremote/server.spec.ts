@@ -35,7 +35,6 @@ describe('postgremote', () => {
   const setupTestEnvironment = async () => {
     const client = await pool.connect();
     try {
-      await client.query(`set role postgres`);
       await client.query(`revoke select
         on all tables in schema pg_catalog
         from public`);
@@ -49,7 +48,9 @@ describe('postgremote', () => {
   const cleanupTestEnvironment = async () => {
     const client = await pool.connect();
     try {
-      await client.query(`set role postgres`);
+      await client.query(`grant select
+        on all tables in schema pg_catalog
+        to public`);
       await client.query(`drop role ${escapeId(defaultRole)}`);
       await client.query(`drop type ${escapeId(tokenType)}`);
     } finally {
