@@ -1,5 +1,4 @@
 Security:
-  ✔ update merge dependency @done
   ☐ test sql injection
 
 Chores:
@@ -10,12 +9,6 @@ PostgreMote:
     ☐ improve jsql with runtime guards
     ☐ get rid of sqlstring dependency
     ☐ check if column names are unique for each table
-  ☐ implement a simple server that converts an SQL-like DSL received over some sort of protocol and then makes a request to the database
-    ✔ make sure user can't work with postgres internal data structures except those that explicitly allowed to use @done
-    ✔ implement server bootstrap that populates token type oid based on the provided token type name @done
-    ✔ pack the whole server as an express middleware with ability to provide configuration and connection pool link @done
-    ✔ guard everything up @done
-    ☐ set up error handling for all of the cases that are not 42501
   ☐ implement a request method that infer select types and wrap it with Promise
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen scheme
   ☐ implement database migration tool for PostgreMote with auto code generation
@@ -30,6 +23,13 @@ Test runner:
   ☐ implement bibimbap's own test runner
 
 Archive:
+  ✔ implement a simple server that converts an SQL-like DSL received over some sort of protocol and then makes a request to the database @done @project(PostgreMote)
+  ✔ update merge dependency @done @project(Security)
+  ✔ make sure user can't work with postgres internal data structures except those that explicitly allowed to use @done @project(PostgreMote)
+  ✔ implement server bootstrap that populates token type oid based on the provided token type name @done @project(PostgreMote)
+  ✔ pack the whole server as an express middleware with ability to provide configuration and connection pool link @done @project(PostgreMote)
+  ✔ guard everything up @done @project(PostgreMote)
+  ✔ set up error handling for all of the cases that are not 42501 @done @project(PostgreMote)
   ✔ implement function @done @project(PostgreMote)
   ✔ get rid of create, drop, grant, and revoke statements (because the only provided statements should be select, insert, delete, update, function calls) @done @project(PostgreMote)
   ✔ implement endpoint for setting cookie with jwt up @done @project(PostgreMote)
