@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
-import { setup, teardown } from './index';
+import { setup, teardown } from './server';
 import { jsql, escapeId } from './jsql';
 
 const connectionParams = {
