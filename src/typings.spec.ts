@@ -47,9 +47,7 @@ test('check typings', () => {
       '\n'
     );
     if (diagnostic.file) {
-      expect(message).toMatchSnapshot(
-        `${diagnostic.file.fileName}`
-      );
+      expect(message).toMatchSnapshot(diagnostic.file.fileName);
     } else {
       expect(message).toMatchSnapshot();
     }

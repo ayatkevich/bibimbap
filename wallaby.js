@@ -1,7 +1,9 @@
 module.exports = function() {
   return {
+    debug: true,
+
     files: [
-      { pattern:'node_modules/@types/**/*', instrument: false },
+      { pattern: 'node_modules/@types/**/*', instrument: false },
       'tsconfig.json',
       'src/**/*.ts',
       '!src/**/*.spec.ts'
@@ -14,6 +16,12 @@ module.exports = function() {
       runner: 'node'
     },
 
-    testFramework: 'jest'
+    testFramework: 'jest',
+
+    setup: function() {
+      process.env.POSTGRES_USER = 'postgremote';
+      process.env.POSTGRES_DB = 'postgremote';
+      process.env.POSTGRES_PASSWORD = '';
+    }
   };
 };
