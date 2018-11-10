@@ -56,35 +56,39 @@ type ColumnAsterisk<TableName extends string> = {
   tableName: TableName;
 };
 
+// prettier-ignore
 type Table<
   TableName extends string,
   Columns extends ColumnFree<any, any, any, any>
-> = {
-  $: JSQLType.TABLE;
-  // table name does not user 'tableName' property to minimize possibility
-  // of name intersection
-  $$: TableName;
-  ['*']: ColumnAsterisk<TableName>;
-} & {
-  [ColumnName in Columns['columnName']]: ColumnLinked<
-    TableName,
-    ColumnName,
-    Columns['columnSettings']['type'],
-    Columns['columnSettings']['defaultValue'],
-    Columns['columnSettings']['nullable']
-  > & {
-    as<AliasName extends string>(
-      aliasName: AliasName
-    ): ColumnLinked<
+> =
+  & {
+    $: JSQLType.TABLE;
+    // table name does not user 'tableName' property to minimize possibility
+    // of name intersection
+    $$: TableName;
+    ['*']: ColumnAsterisk<TableName>;
+  }
+  & {
+    [ColumnName in Columns['columnName']]: ColumnLinked<
       TableName,
       ColumnName,
       Columns['columnSettings']['type'],
       Columns['columnSettings']['defaultValue'],
-      Columns['columnSettings']['nullable'],
-      AliasName
-    >;
-  }
-};
+      Columns['columnSettings']['nullable']
+    >
+    & {
+      as<AliasName extends string>(
+        aliasName: AliasName
+      ): ColumnLinked<
+        TableName,
+        ColumnName,
+        Columns['columnSettings']['type'],
+        Columns['columnSettings']['defaultValue'],
+        Columns['columnSettings']['nullable'],
+        AliasName
+      >;
+    }
+  };
 
 type StoredFunction<
   FunctionName extends string,
@@ -130,16 +134,17 @@ type ColumnType<
   Columns extends ColumnFree<any, any, any, any>
 > = ReturnType<NamedColumn<ColumnName, Columns>['columnSettings']['type']>;
 
-type PropertiesFromColumns<Args extends ColumnFree<any, any, any, any>> = {
-  [ArgName in NullableColumns<Args>['columnName']]+?: ColumnType<ArgName, Args>
-} &
-  {
-    [ArgName in DefaultableColumns<Args>['columnName']]+?: ColumnType<
-      ArgName,
-      Args
-    >
-  } &
-  {
+// prettier-ignore
+type PropertiesFromColumns<Args extends ColumnFree<any, any, any, any>> =
+  & {
+    [ArgName in NullableColumns<Args>['columnName']]+?:
+      ColumnType<ArgName, Args>
+  }
+  & {
+    [ArgName in DefaultableColumns<Args>['columnName']]+?:
+      ColumnType<ArgName, Args>
+  }
+  & {
     [ArgName in RequiredColumns<
       Args,
       NullableColumns<Args> | DefaultableColumns<Args>
