@@ -29,7 +29,7 @@ describe(`postgremote client`, () => {
     ]);
 
     const result = await exec(
-      jsql.select([PgRoles.rolname], { from: PgRoles })
+      jsql.select([PgRoles.rolname], { from: [PgRoles] })
     );
 
     expect(result).toEqual(

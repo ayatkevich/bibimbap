@@ -7,7 +7,9 @@ import { jsql } from 'postgremote/jsql';
     jsql.column('c2', { type: String })
   ]);
 
-  for (const row of await exec(jsql.select([MyTable.c1], { from: MyTable }))) {
+  for (const row of await exec(
+    jsql.select([MyTable.c1], { from: [MyTable] })
+  )) {
     row.c1;
 
     // here should be error
@@ -17,7 +19,7 @@ import { jsql } from 'postgremote/jsql';
   }
 
   for (const row of await exec(
-    jsql.select([MyTable.c1, MyTable.c2], { from: MyTable })
+    jsql.select([MyTable.c1, MyTable.c2], { from: [MyTable] })
   )) {
     row.c1;
     row.c2;
@@ -27,7 +29,7 @@ import { jsql } from 'postgremote/jsql';
   }
 
   for (const row of await exec(
-    jsql.select([MyTable['*'], MyTable.c1.as('c3')], { from: MyTable })
+    jsql.select([MyTable['*'], MyTable.c1.as('c3')], { from: [MyTable] })
   )) {
     row.c1;
     row.c2;

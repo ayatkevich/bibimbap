@@ -95,6 +95,7 @@ describe(`DSL`, () => {
       ]);
 
       expect(() => {
+        // @ts-ignore
         jsql.select([TableName.column]).toJSQL();
       }).toThrowError(JSQLError);
     });
@@ -121,7 +122,7 @@ describe(`DSL`, () => {
       ]);
 
       expect(
-        jsql.select([TableName['*']], { from: TableName }).toQueryObject()
+        jsql.select([TableName['*']], { from: [TableName] }).toQueryObject()
       ).toEqual({ text: `SELECT "TableName".* FROM "TableName"`, values: [] });
     });
 
@@ -139,7 +140,7 @@ describe(`DSL`, () => {
 
       expect(
         jsql
-          .select([User.firstName, User.lastName], { from: User })
+          .select([User.firstName, User.lastName], { from: [User] })
           .toQueryObject()
       ).toEqual({
         text: `SELECT "User"."firstName", "User"."lastName" FROM "User"`,
@@ -156,11 +157,23 @@ describe(`DSL`, () => {
       expect(
         jsql
           .select([User.username.as('firstName'), User.lastName], {
-            from: User
+            from: [User]
           })
           .toQueryObject()
       ).toEqual({
         text: `SELECT "User"."username" as "firstName", "User"."lastName" FROM "User"`,
+        values: []
+      });
+    });
+
+    test(`SELECT "T1"."a", "T2"."b" FROM "T1", "T2"`, () => {
+      const T1 = jsql.table('T1', [jsql.column('a', { type: String })]);
+      const T2 = jsql.table('T2', [jsql.column('b', { type: String })]);
+
+      expect(
+        jsql.select([T1.a, T2.b], { from: [T1, T2] }).toQueryObject()
+      ).toEqual({
+        text: `SELECT "T1"."a", "T2"."b" FROM "T1", "T2"`,
         values: []
       });
     });

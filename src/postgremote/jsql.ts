@@ -169,7 +169,7 @@ export enum QueryKind {
 export interface Select<Params extends SelectKind, From extends FromKind> {
   kind: QueryKind.SELECT;
   select: Params[];
-  from: From;
+  from: From[];
 }
 
 enum InsertKind {
@@ -260,9 +260,7 @@ function* extractTableColumns(
   }
 }
 
-const jsqlCompileSelect = (
-  query: Select<SelectKind, FromKind>
-) => {
+const jsqlCompileSelect = (query: Select<SelectKind, FromKind>) => {
   if (!query.from) {
     throw new JSQLError(`FROM statement is required`);
   }
@@ -285,8 +283,17 @@ const jsqlCompileSelect = (
     })
     .join(', ');
 
+  const fromExpression = query.from
+    .map(expression => {
+      switch (expression.$) {
+        case JSQLType.TABLE:
+          return escapeId(expression.$$);
+      }
+    })
+    .join(', ');
+
   return {
-    text: `SELECT ${selectExpression} FROM ${escapeId(query.from.$$)}`,
+    text: `SELECT ${selectExpression} FROM ${fromExpression}`,
     values: []
   };
 };
@@ -446,12 +453,12 @@ jsql.function = <
 jsql.select = <Params extends SelectKind, From extends FromKind>(
   params: Params[],
   clause: {
-    from?: From;
-  } = {}
+    from: From[];
+  }
 ) =>
   new class SelectGenerator extends QueryGenerator<Select<Params, From>> {
     toJSQL(): Select<Params, From> {
-      if (!clause.from) {
+      if (!clause || !clause.from) {
         throw new JSQLError(
           `You should setup from where you want to do select`
         );

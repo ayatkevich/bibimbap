@@ -7,7 +7,8 @@ Chores:
 PostgreMote:
   ☐ implement an SQL-like DSL
     ☐ add where clause
-    ☐ add joins and multiple from clauses
+    ✔ add multiple from clauses @done
+    ☐ add joins
     ☐ improve jsql with runtime guards
     ☐ get rid of sqlstring dependency
     ☐ check if column names are unique for each table

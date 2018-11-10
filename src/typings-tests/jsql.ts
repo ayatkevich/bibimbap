@@ -108,4 +108,4 @@ const TableForSelect1 = jsql.table('TableForSelect1', [
   jsql.column('column1', { type: String })
 ]);
 
-jsql.select([TableForSelect1['*']], { from: TableForSelect1 });
+jsql.select([TableForSelect1['*']], { from: [TableForSelect1] });
