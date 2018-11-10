@@ -99,3 +99,13 @@ oneArgRequiredTwoOptional({
 });
 // wrong type of arg
 oneArgRequiredTwoOptional({ arg: '', nullable: 'string instead of number' });
+
+/**
+ * Select tests
+ */
+
+const TableForSelect1 = jsql.table('TableForSelect1', [
+  jsql.column('column1', { type: String })
+]);
+
+jsql.select([TableForSelect1['*']], { from: TableForSelect1 });

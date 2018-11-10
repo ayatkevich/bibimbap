@@ -22,7 +22,7 @@ enum ColumnKind {
   FREE,
   ASTERISK
 }
-type ColumnFree<
+export type ColumnFree<
   ColumnName extends string,
   DataType extends (...args: any[]) => any,
   DataDefaultable extends boolean | undefined,
@@ -34,7 +34,7 @@ type ColumnFree<
   columnSettings: ColumnSettings<DataType, DataDefaultable, DataNullable>;
 };
 
-type ColumnLinked<
+export type ColumnLinked<
   TableName extends string,
   ColumnName extends string,
   DataType extends (...args: any[]) => any,
@@ -50,14 +50,14 @@ type ColumnLinked<
   columnSettings: ColumnSettings<DataType, DataDefaultable, DataNullable>;
 };
 
-type ColumnAsterisk<TableName extends string> = {
+export type ColumnAsterisk<TableName extends string> = {
   $: JSQLType.COLUMN;
   kind: ColumnKind.ASTERISK;
   tableName: TableName;
 };
 
 // prettier-ignore
-type Table<
+export type Table<
   TableName extends string,
   Columns extends ColumnFree<any, any, any, any>
 > =
@@ -153,12 +153,12 @@ type PropertiesFromColumns<Args extends ColumnFree<any, any, any, any>> =
 
 type TableProperties<OfTable> = PropertiesFromColumns<UnpackedColumns<OfTable>>;
 
-type SelectExpression =
+export type SelectKind =
   | ColumnAsterisk<any>
   | ColumnLinked<any, any, any, any, any>
   | ColumnLinked<any, any, any, any, any, any>;
 
-type FromExpression = Table<any, any>;
+export type FromKind = Table<any, any>;
 
 export enum QueryKind {
   SELECT,
@@ -166,10 +166,10 @@ export enum QueryKind {
   EXECUTE
 }
 
-interface Select {
+export interface Select<Params extends SelectKind[], From extends FromKind> {
   kind: QueryKind.SELECT;
-  select: SelectExpression[];
-  from: FromExpression;
+  select: Params;
+  from: From;
 }
 
 enum InsertKind {
@@ -204,9 +204,9 @@ type QueryObject = {
   values: any[];
 };
 
-export type Query = Select | Insert<any> | Execute;
+export type Query = Select<any, any> | Insert<any> | Execute;
 
-abstract class QueryGenerator<T extends Query> {
+export abstract class QueryGenerator<T extends Query> {
   abstract toJSQL(): T;
 
   toQueryObject() {
@@ -260,7 +260,9 @@ function* extractTableColumns(
   }
 }
 
-const jsqlCompileSelect = (query: Select) => {
+const jsqlCompileSelect = <Params extends SelectKind[], From extends FromKind>(
+  query: Select<Params, From>
+) => {
   if (!query.from) {
     throw new JSQLError(`FROM statement is required`);
   }
@@ -327,14 +329,13 @@ const jsqlCompileExecute = (query: Execute) => {
   switch (query.executeKind) {
     case ExecuteKind.FUNCTION:
       return {
-        text: `SELECT ${escapeId(query.functionName)}(${query.functionArgs.map(
-          (_, i) => `$${i + 1}`
-        ).join(', ')})`,
-        values: query.functionArgs.map(
-          functionArg =>
-            query.args[functionArg.columnName]
-              ? query.args[functionArg.columnName]
-              : null
+        text: `SELECT ${escapeId(query.functionName)}(${query.functionArgs
+          .map((_, i) => `$${i + 1}`)
+          .join(', ')})`,
+        values: query.functionArgs.map(functionArg =>
+          query.args[functionArg.columnName]
+            ? query.args[functionArg.columnName]
+            : null
         )
       };
   }
@@ -442,17 +443,15 @@ jsql.function = <
   return executor;
 };
 
-jsql.select = (...selectExpressions: SelectExpression[]) =>
-  new class SelectGenerator extends QueryGenerator<Select> {
-    private fromExpression?: FromExpression;
-
-    from(fromExpression: Table<any, any>) {
-      this.fromExpression = fromExpression;
-      return this;
-    }
-
-    toJSQL(): Select {
-      if (!this.fromExpression) {
+jsql.select = <Params extends SelectKind[], From extends FromKind>(
+  params: Params,
+  clause: {
+    from?: From;
+  } = {}
+) =>
+  new class SelectGenerator extends QueryGenerator<Select<Params, From>> {
+    toJSQL(): Select<Params, From> {
+      if (!clause.from) {
         throw new JSQLError(
           `You should setup from where you want to do select`
         );
@@ -460,8 +459,8 @@ jsql.select = (...selectExpressions: SelectExpression[]) =>
 
       return {
         kind: QueryKind.SELECT,
-        select: selectExpressions,
-        from: this.fromExpression
+        select: params,
+        from: clause.from
       };
     }
   }();
@@ -469,12 +468,13 @@ jsql.select = (...selectExpressions: SelectExpression[]) =>
 jsql.insert = <Into extends Table<any, any>>(
   table: Into,
   values: TableProperties<Into>
-) => {
-  if (Object.getOwnPropertyNames(values).length === 0) {
-    throw new JSQLError('You should pass at least one column');
-  }
-  return new class InsertGenerator extends QueryGenerator<Insert<Into>> {
+) =>
+  new class InsertGenerator extends QueryGenerator<Insert<Into>> {
     toJSQL(): Insert<Into> {
+      if (Object.getOwnPropertyNames(values).length === 0) {
+        throw new JSQLError('You should pass at least one column');
+      }
+
       return {
         kind: QueryKind.INSERT,
         insertType: InsertKind.VALUES,
@@ -483,4 +483,3 @@ jsql.insert = <Into extends Table<any, any>>(
       };
     }
   }();
-};

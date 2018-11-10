@@ -108,12 +108,7 @@ describe('postgremote server', () => {
 
         const { body, error } = await request(app)
           .post(endpoint)
-          .send(
-            jsql
-              .select(TestTable['*'])
-              .from(TestTable)
-              .toJSQL()
-          );
+          .send(jsql.select([TestTable['*']], { from: TestTable }).toJSQL());
 
         expect(error).toBeFalsy();
         expect(body).toEqual([{ name: `hey what's up` }]);
@@ -147,12 +142,7 @@ describe('postgremote server', () => {
 
         const { error } = await request(app)
           .post(endpoint)
-          .send(
-            jsql
-              .select(TestTable['*'])
-              .from(TestTable)
-              .toJSQL()
-          )
+          .send(jsql.select([TestTable['*']], { from: TestTable }).toJSQL())
           .expect(403);
 
         expect(error.text).toMatch('permission denied');
@@ -210,12 +200,7 @@ describe('postgremote server', () => {
         const { body } = await request(app)
           .post(endpoint)
           .set('Cookie', `jwt=${testTokenOne}`)
-          .send(
-            jsql
-              .select(TestTable['*'])
-              .from(TestTable)
-              .toJSQL()
-          )
+          .send(jsql.select([TestTable['*']], { from: TestTable }).toJSQL())
           .expect(200);
         // and it should actually return a list of rows as it usually does
         expect(body).toEqual([{ name: `Just for a test` }]);
@@ -227,12 +212,7 @@ describe('postgremote server', () => {
         await request(app)
           .post(endpoint)
           .set('Cookie', `jwt=${testTokenTwo}`)
-          .send(
-            jsql
-              .select(TestTable['*'])
-              .from(TestTable)
-              .toJSQL()
-          )
+          .send(jsql.select([TestTable['*']], { from: TestTable }).toJSQL())
           .expect(403);
       } finally {
         // cleaning everything up
@@ -298,8 +278,7 @@ describe('postgremote server', () => {
         .post(endpoint)
         .send(
           jsql
-            .select(PgStatsActivity['*'])
-            .from(PgStatsActivity)
+            .select([PgStatsActivity['*']], { from: PgStatsActivity })
             .toJSQL()
         )
         .expect(403);
@@ -358,12 +337,7 @@ describe('postgremote server', () => {
 
         await request(app)
           .post(endpoint)
-          .send(
-            jsql
-              .select(TestTable['*'])
-              .from(TestTable)
-              .toJSQL()
-          )
+          .send(jsql.select([TestTable['*']], { from: TestTable }).toJSQL())
           .expect(200);
       } finally {
         await client.query(`drop table ${tableName}`);

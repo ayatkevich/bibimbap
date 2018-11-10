@@ -1,4 +1,4 @@
-import { jsql, JSQLError, escape, escapeId, QueryKind } from './jsql';
+import { escape, escapeId, jsql, JSQLError, QueryKind } from './jsql';
 
 describe(`DSL`, () => {
   describe(`escaping`, () => {
@@ -95,7 +95,7 @@ describe(`DSL`, () => {
       ]);
 
       expect(() => {
-        jsql.select(TableName.column).toJSQL();
+        jsql.select([TableName.column]).toJSQL();
       }).toThrowError(JSQLError);
     });
 
@@ -121,10 +121,7 @@ describe(`DSL`, () => {
       ]);
 
       expect(
-        jsql
-          .select(TableName['*'])
-          .from(TableName)
-          .toQueryObject()
+        jsql.select([TableName['*']], { from: TableName }).toQueryObject()
       ).toEqual({ text: `SELECT "TableName".* FROM "TableName"`, values: [] });
     });
 
@@ -142,8 +139,7 @@ describe(`DSL`, () => {
 
       expect(
         jsql
-          .select(User.firstName, User.lastName)
-          .from(User)
+          .select([User.firstName, User.lastName], { from: User })
           .toQueryObject()
       ).toEqual({
         text: `SELECT "User"."firstName", "User"."lastName" FROM "User"`,
@@ -159,8 +155,9 @@ describe(`DSL`, () => {
 
       expect(
         jsql
-          .select(User.username.as('firstName'), User.lastName)
-          .from(User)
+          .select([User.username.as('firstName'), User.lastName], {
+            from: User
+          })
           .toQueryObject()
       ).toEqual({
         text: `SELECT "User"."username" as "firstName", "User"."lastName" FROM "User"`,
@@ -209,7 +206,7 @@ describe(`DSL`, () => {
         jsql.column('testColumn', { type: String, nullable: true })
       ]);
       expect(() => {
-        jsql.insert(TestTable, {});
+        jsql.insert(TestTable, {}).toJSQL();
       }).toThrowError(JSQLError);
     });
   });
