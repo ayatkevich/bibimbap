@@ -15,23 +15,6 @@ export function config(pool: Pool) {
   databaseConnectionPool = pool;
 }
 
-type TupleSignature<Tuple extends unknown[]> = (...args: Tuple) => void;
-
-type UnpackedTuple<Signature, Hack extends string = 'typescript hack'> = {
-  [Key in Hack]: Signature extends (head: infer Head) => void
-    ? Head
-    : UnpackedTupleRest<Signature, Hack>
-}[Hack];
-
-type UnpackedTupleRest<Signature, Hack extends string = 'typescript hack'> = {
-  [Key in Hack]: Signature extends (
-    arg: infer Head,
-    ...args: infer Rest
-  ) => void
-    ? Head | UnpackedTuple<(...args: Rest) => void, Hack>
-    : never
-}[Hack];
-
 // prettier-ignore
 type ColumnName<Column extends unknown>
   = Column extends ColumnFree<infer Name, any, any, any> ? Name
@@ -63,7 +46,7 @@ type AstersikColumns<
 // prettier-ignore
 type UnpackedColumns<Query extends JSQLQuery>
   = Query extends Select<infer Params, infer From>
-    ? AstersikColumns<UnpackedTuple<TupleSignature<Params>>, From> : never;
+    ? AstersikColumns<Params, From> : never;
 
 type QueryResultType<Columns> = {
   [Key in ColumnName<Columns>]: ReturnType<

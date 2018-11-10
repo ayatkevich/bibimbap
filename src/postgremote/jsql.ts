@@ -166,9 +166,9 @@ export enum QueryKind {
   EXECUTE
 }
 
-export interface Select<Params extends SelectKind[], From extends FromKind> {
+export interface Select<Params extends SelectKind, From extends FromKind> {
   kind: QueryKind.SELECT;
-  select: Params;
+  select: Params[];
   from: From;
 }
 
@@ -260,8 +260,8 @@ function* extractTableColumns(
   }
 }
 
-const jsqlCompileSelect = <Params extends SelectKind[], From extends FromKind>(
-  query: Select<Params, From>
+const jsqlCompileSelect = (
+  query: Select<SelectKind, FromKind>
 ) => {
   if (!query.from) {
     throw new JSQLError(`FROM statement is required`);
@@ -443,8 +443,8 @@ jsql.function = <
   return executor;
 };
 
-jsql.select = <Params extends SelectKind[], From extends FromKind>(
-  params: Params,
+jsql.select = <Params extends SelectKind, From extends FromKind>(
+  params: Params[],
   clause: {
     from?: From;
   } = {}

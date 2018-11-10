@@ -12,6 +12,7 @@ PostgreMote:
   ☐ implement a request method that infer select types and wrap it with Promise
     ✔ develop simple implementation that uses just configured pool for server side use @done
     ✔ infer select types @done
+    ✔ get rid of tuple to union transformation legacy of the first version @done
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen scheme
   ☐ implement database migration tool for PostgreMote with auto code generation
   ☐ implement database testing tool PostgreMote with all the generated types used so we could make a static analysis over the tests
