@@ -13,7 +13,8 @@ PostgreMote:
     ☐ get rid of sqlstring dependency
     ☐ check if column names are unique for each table
   ☐ implement a request method that infer select types and wrap it with Promise
-    ☐ implement http method
+    ✔ implement http method @done
+    ☐ find the way to compile client for client-side without server-side code
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen schemas
   ☐ implement database migration tool for PostgreMote with auto code generation
   ☐ implement database testing tool PostgreMote with all the generated types used so we could make a static analysis over the tests

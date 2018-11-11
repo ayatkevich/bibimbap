@@ -1,18 +1,27 @@
 import { Pool } from 'pg';
+import request from 'superagent';
 import {
+  ColumnAsterisk,
+  ColumnFree,
+  ColumnLinked,
   Query as JSQLQuery,
   QueryGenerator,
   Select,
-  ColumnLinked,
-  ColumnAsterisk,
-  Table,
-  ColumnFree
+  Table
 } from './jsql';
+import { PostgremoteError } from './server';
 
-export let databaseConnectionPool: Pool;
+export let databaseConnectionPool: Pool | undefined;
+export let serverEndpoint: string | undefined;
 
-export function config(pool: Pool) {
-  databaseConnectionPool = pool;
+export function config(poolOrEndpoint: Pool | string) {
+  databaseConnectionPool = undefined;
+  serverEndpoint = undefined;
+  if (typeof poolOrEndpoint === 'object') {
+    databaseConnectionPool = poolOrEndpoint;
+  } else if (typeof poolOrEndpoint === 'string') {
+    serverEndpoint = poolOrEndpoint;
+  }
 }
 
 // prettier-ignore
@@ -57,11 +66,19 @@ type QueryResultType<Columns> = {
 export async function exec<Query extends JSQLQuery>(
   query: QueryGenerator<Query>
 ): Promise<QueryResultType<UnpackedColumns<Query>>[]> {
-  const client = await databaseConnectionPool.connect();
-  try {
-    const { rows } = await client.query(query.toQueryObject());
-    return rows as QueryResultType<UnpackedColumns<Query>>[];
-  } finally {
-    client.release();
+  if (databaseConnectionPool) {
+    const client = await databaseConnectionPool.connect();
+    try {
+      const { rows } = await client.query(query.toQueryObject());
+      return rows as QueryResultType<UnpackedColumns<Query>>[];
+    } finally {
+      client.release();
+    }
+  } else if (serverEndpoint) {
+    const { body } = await request.post(serverEndpoint).send(query.toJSQL());
+    return body as QueryResultType<UnpackedColumns<Query>>[];
   }
+  throw new PostgremoteError(
+    'Exec should be provided with either pool or endpoint'
+  );
 }
