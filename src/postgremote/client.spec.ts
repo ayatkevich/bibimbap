@@ -63,9 +63,9 @@ describe(`postgremote client pool`, () => {
   describe('postgremote client http', () => {
     let server: Server;
     let port: number;
-    const defaultRole = 'anonymous';
+    const defaultRole = 'clientAnonymous';
     const secret = 'this is a secret';
-    const tokenType = 'jwtToken';
+    const tokenType = 'clientJwtToken';
     const tokenExpiresIn = 4 * 7 * 24 * 60 * 60e3;
     const endpoint = '/';
 
@@ -76,6 +76,9 @@ describe(`postgremote client pool`, () => {
           `create type ${escapeId(tokenType)} as ( sub text )`
         );
         await client.query(`create role ${escapeId(defaultRole)}`);
+        await client.query(`grant select
+          on all tables in schema pg_catalog
+          to ${escapeId(defaultRole)}`);
       } finally {
         client.release();
       }
@@ -84,6 +87,9 @@ describe(`postgremote client pool`, () => {
     const cleanupTestEnvironment = async () => {
       const client = await pool.connect();
       try {
+        await client.query(`revoke select
+          on all tables in schema pg_catalog
+          from ${escapeId(defaultRole)}`);
         await client.query(`drop role ${escapeId(defaultRole)}`);
         await client.query(`drop type ${escapeId(tokenType)}`);
       } finally {
@@ -93,6 +99,7 @@ describe(`postgremote client pool`, () => {
 
     beforeAll(async () => {
       await setupTestEnvironment();
+
       const app = express();
       port = await getPort();
       server = app.listen(port);
