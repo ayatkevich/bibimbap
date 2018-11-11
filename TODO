@@ -11,7 +11,6 @@ PostgreMote:
     ☐ add joins
     ☐ improve jsql with runtime guards
     ☐ get rid of sqlstring dependency
-    ☐ check if column names are unique for each table
   ☐ implement a request method that infer select types and wrap it with Promise
     ✔ implement http method @done
     ☐ find the way to compile client for client-side without server-side code
