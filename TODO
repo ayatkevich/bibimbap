@@ -7,14 +7,18 @@ Chores:
 PostgreMote:
   ☐ implement an SQL-like DSL
     ☐ add where clause
-    ✔ add multiple from clauses @done
+    ☐ implement procedure
     ☐ add joins
     ☐ improve jsql with runtime guards
     ☐ get rid of sqlstring dependency
   ☐ implement a request method that infer select types and wrap it with Promise
-    ✔ implement http method @done
     ☐ find the way to compile client for client-side without server-side code
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen schemas
+    ☐ generate tables and views
+    ☐ generate functions
+    ☐ generate procedures
+  ☐ server
+    ☐ get rid of default schema and set up search_path to just public
   ☐ implement database migration tool for PostgreMote with auto code generation
   ☐ implement database testing tool PostgreMote with all the generated types used so we could make a static analysis over the tests
   ☐ implement postgresql code coverage tool
@@ -27,6 +31,8 @@ Test runner:
   ☐ implement bibimbap's own test runner
 
 Archive:
+  ✔ add multiple from clauses @done @project(PostgreMote)
+  ✔ implement http method @done @project(PostgreMote)
   ✔ develop simple implementation that uses just configured pool for server side use @done @project(PostgreMote)
   ✔ infer select types @done @project(PostgreMote)
   ✔ get rid of tuple to union transformation legacy of the first version @done @project(PostgreMote)
