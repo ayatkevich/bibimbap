@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import prettier from 'prettier';
 import { Pool } from 'pg';
 import { escapeId } from './jsql';
@@ -42,6 +43,18 @@ describe('jsql code generator', () => {
       }
 
       const generator = async (schemas: string[]) => {
+        let resultFile = ts.createSourceFile(
+          'someFileName.ts',
+          '',
+          ts.ScriptTarget.Latest,
+          false,
+          ts.ScriptKind.TS
+        );
+
+        const printer = ts.createPrinter({
+          newLine: ts.NewLineKind.LineFeed
+        });
+
         const { rows: tables } = await client.query(
           `select *
             from information_schema.tables
@@ -49,7 +62,7 @@ describe('jsql code generator', () => {
           [schemas]
         );
 
-        let tablesDump = '';
+        let tableDeclarations = [];
         for (const table of tables) {
           const { rows: columns } = await client.query(
             `select *
@@ -57,19 +70,72 @@ describe('jsql code generator', () => {
               where table_name = $1`,
             [table.table_name]
           );
-          let columnsDump = '';
+
+          let columnDeclarations = [];
           for (const column of columns) {
-            columnsDump += `jsql.column('${
-              column.column_name
-            }', {type: String}),`;
+            columnDeclarations.push(
+              ts.createCall(
+                ts.createPropertyAccess(ts.createIdentifier('jsql'), 'column'),
+                undefined,
+                [
+                  ts.createLiteral(column.column_name),
+                  ts.createObjectLiteral([
+                    ts.createPropertyAssignment(
+                      ts.createIdentifier('type'),
+                      ts.createIdentifier('String')
+                    )
+                  ])
+                ]
+              )
+            );
           }
 
-          tablesDump += `export const ${table.table_name} = jsql.table('${
-            table.table_schema
-          }.${table.table_name}', [${columnsDump}]);`;
+          tableDeclarations.push(
+            ts.createVariableStatement(
+              [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
+              ts.createVariableDeclarationList(
+                [
+                  ts.createVariableDeclaration(
+                    table.table_name,
+                    undefined,
+                    ts.createCall(
+                      ts.createPropertyAccess(
+                        ts.createIdentifier('jsql'),
+                        'table'
+                      ),
+                      undefined,
+                      [
+                        ts.createLiteral(
+                          `${table.table_schema}.${table.table_name}`
+                        ),
+                        ts.createArrayLiteral(columnDeclarations)
+                      ]
+                    )
+                  )
+                ],
+                ts.NodeFlags.Const
+              )
+            )
+          );
         }
 
-        return prettier.format(tablesDump, {
+        resultFile = ts.updateSourceFileNode(
+          resultFile,
+          ts.setTextRange(
+            ts.createNodeArray([
+              ts.createImportDeclaration(
+                undefined,
+                undefined,
+                ts.createImportClause(ts.createIdentifier('jsql'), undefined),
+                ts.createLiteral('postgremote/jsql')
+              ),
+              ...tableDeclarations
+            ]),
+            resultFile.statements
+          )
+        );
+
+        return prettier.format(printer.printFile(resultFile), {
           singleQuote: true,
           parser: 'typescript'
         });
@@ -77,7 +143,8 @@ describe('jsql code generator', () => {
 
       // so when we run our generator we should get a typescript code
       expect(await generator([schema])).toMatchInlineSnapshot(`
-"export const Table0 = jsql.table('myOwnUniqueSchema.Table0', [
+"import jsql from 'postgremote/jsql';
+export const Table0 = jsql.table('myOwnUniqueSchema.Table0', [
   jsql.column('column0', { type: String })
 ]);
 export const Table1 = jsql.table('myOwnUniqueSchema.Table1', [

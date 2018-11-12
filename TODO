@@ -17,7 +17,7 @@ PostgreMote:
     ☐ generate views
     ☐ generate functions
     ☐ generate procedures
-    ☐ use typescript public API instead of string compilation
+    ✔ use typescript public API instead of string compilation @done
     ☐ use project-wide prettier settings
   ☐ server
     ☐ get rid of default schema and set up search_path to just public
