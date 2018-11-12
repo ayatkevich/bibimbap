@@ -126,7 +126,15 @@ describe('jsql code generator', () => {
               ts.createImportDeclaration(
                 undefined,
                 undefined,
-                ts.createImportClause(ts.createIdentifier('jsql'), undefined),
+                ts.createImportClause(
+                  undefined,
+                  ts.createNamedImports([
+                    ts.createImportSpecifier(
+                      undefined,
+                      ts.createIdentifier('jsql')
+                    )
+                  ])
+                ),
                 ts.createLiteral('postgremote/jsql')
               ),
               ...tableDeclarations
@@ -143,7 +151,7 @@ describe('jsql code generator', () => {
 
       // so when we run our generator we should get a typescript code
       expect(await generator([schema])).toMatchInlineSnapshot(`
-"import jsql from 'postgremote/jsql';
+"import { jsql } from 'postgremote/jsql';
 export const Table0 = jsql.table('myOwnUniqueSchema.Table0', [
   jsql.column('column0', { type: String })
 ]);
