@@ -56,29 +56,45 @@ describe('jsql code generator', () => {
         });
 
         const { rows: tables } = await client.query(
-          `select *
-            from information_schema.tables
-            where table_schema = ANY($1::name[])`,
+          `
+          select
+            "Table"."tableName",
+            "Table"."schemaName",
+            json_agg("Columns".*) as "columns"
+          from
+            (select
+              "Class".oid as "tableId",
+              "Namespace".oid as "schemaId",
+              "Class".relname as "tableName",
+              "Namespace".nspname as "schemaName"
+            from pg_namespace as "Namespace"
+              left join pg_class as "Class"
+                on "Class".relnamespace = "Namespace".oid
+            where "Namespace".nspname = any($1::name[])
+              and "Class".relkind in ('r', 'v', 'm', 'p', 'f')) as "Table"
+            left join lateral (
+              select attname as "columnName"
+              from pg_attribute
+              where attrelid = "Table"."tableId"
+                and attnum > 0
+            ) as "Columns" on true
+          group by
+            "Table"."tableName",
+            "Table"."schemaName"
+          `,
           [schemas]
         );
 
         let tableDeclarations = [];
         for (const table of tables) {
-          const { rows: columns } = await client.query(
-            `select *
-              from information_schema.columns
-              where table_name = $1`,
-            [table.table_name]
-          );
-
           let columnDeclarations = [];
-          for (const column of columns) {
+          for (const column of table.columns) {
             columnDeclarations.push(
               ts.createCall(
                 ts.createPropertyAccess(ts.createIdentifier('jsql'), 'column'),
                 undefined,
                 [
-                  ts.createLiteral(column.column_name),
+                  ts.createLiteral(column.columnName),
                   ts.createObjectLiteral([
                     ts.createPropertyAssignment(
                       ts.createIdentifier('type'),
@@ -96,7 +112,7 @@ describe('jsql code generator', () => {
               ts.createVariableDeclarationList(
                 [
                   ts.createVariableDeclaration(
-                    table.table_name,
+                    table.tableName,
                     undefined,
                     ts.createCall(
                       ts.createPropertyAccess(
@@ -106,7 +122,7 @@ describe('jsql code generator', () => {
                       undefined,
                       [
                         ts.createLiteral(
-                          `${table.table_schema}.${table.table_name}`
+                          `${table.schemaName}.${table.tableName}`
                         ),
                         ts.createArrayLiteral(columnDeclarations)
                       ]
@@ -152,11 +168,11 @@ describe('jsql code generator', () => {
       // so when we run our generator we should get a typescript code
       expect(await generator([schema])).toMatchInlineSnapshot(`
 "import { jsql } from 'postgremote/jsql';
-export const Table0 = jsql.table('myOwnUniqueSchema.Table0', [
-  jsql.column('column0', { type: String })
-]);
 export const Table1 = jsql.table('myOwnUniqueSchema.Table1', [
   jsql.column('column1', { type: String })
+]);
+export const Table0 = jsql.table('myOwnUniqueSchema.Table0', [
+  jsql.column('column0', { type: String })
 ]);
 export const Table2 = jsql.table('myOwnUniqueSchema.Table2', [
   jsql.column('column2', { type: String })

@@ -14,7 +14,7 @@ PostgreMote:
   ☐ implement a request method that infer select types and wrap it with Promise
     ☐ find the way to compile client for client-side without server-side code
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen schemas
-    ☐ use pg_catalog instead of information_schema
+    ✔ use pg_catalog instead of information_schema @done
     ☐ generate columns with all of the settings and types
     ☐ full type inference with postgresql data types
     ☐ generate functions
