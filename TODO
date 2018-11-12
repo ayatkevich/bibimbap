@@ -9,13 +9,14 @@ PostgreMote:
     ☐ add where clause
     ☐ implement procedure
     ☐ add joins
+    ☐ get rid of defaulValue for columns, because they are supposed to be generated from database
     ☐ improve jsql with runtime guards
     ☐ get rid of sqlstring dependency
   ☐ implement a request method that infer select types and wrap it with Promise
     ☐ find the way to compile client for client-side without server-side code
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen schemas
     ✔ use pg_catalog instead of information_schema @done
-    ☐ generate columns with all of the settings and types
+    ✔ generate columns with all of the settings @done
     ☐ full type inference with postgresql data types
     ☐ generate functions
     ☐ generate procedures

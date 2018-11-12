@@ -29,18 +29,21 @@ describe('jsql code generator', () => {
 
     try {
       // we'll need a few tables
-      const prerequisites = ['char(1)', 'text', 'varchar(1)'].map((item, i) => [
-        `Table${i}`,
-        `column${i}`,
-        item
-      ]);
-      for (const [tableName, columnName, type] of prerequisites) {
-        await client.query(`
-          create table ${escapeId(schema)}.${escapeId(tableName)} (
-            ${escapeId(columnName)} ${type}
-          )
-        `);
-      }
+      await client.query(`
+        create table ${escapeId(schema)}."Table0" (
+          column0 text not null
+        )
+      `);
+      await client.query(`
+        create table ${escapeId(schema)}."Table1" (
+          column0 char(1) default 'y'
+        )
+      `);
+      await client.query(`
+        create table ${escapeId(schema)}."Table2" (
+          column0 varchar(100)
+        )
+      `);
 
       const generator = async (schemas: string[]) => {
         let resultFile = ts.createSourceFile(
@@ -73,7 +76,10 @@ describe('jsql code generator', () => {
             where "Namespace".nspname = any($1::name[])
               and "Class".relkind in ('r', 'v', 'm', 'p', 'f')) as "Table"
             left join lateral (
-              select attname as "columnName"
+              select
+                attname as "columnName",
+                atthasdef as "hasDefaultValue",
+                attnotnull as "notNull"
               from pg_attribute
               where attrelid = "Table"."tableId"
                 and attnum > 0
@@ -99,6 +105,14 @@ describe('jsql code generator', () => {
                     ts.createPropertyAssignment(
                       ts.createIdentifier('type'),
                       ts.createIdentifier('String')
+                    ),
+                    ts.createPropertyAssignment(
+                      ts.createIdentifier('nullable'),
+                      ts.createIdentifier(String(!column.notNull))
+                    ),
+                    ts.createPropertyAssignment(
+                      ts.createIdentifier('defaultable'),
+                      ts.createIdentifier(String(column.hasDefaultValue))
                     )
                   ])
                 ]
@@ -169,13 +183,13 @@ describe('jsql code generator', () => {
       expect(await generator([schema])).toMatchInlineSnapshot(`
 "import { jsql } from 'postgremote/jsql';
 export const Table1 = jsql.table('myOwnUniqueSchema.Table1', [
-  jsql.column('column1', { type: String })
+  jsql.column('column0', { type: String, nullable: true, defaultable: true })
 ]);
 export const Table0 = jsql.table('myOwnUniqueSchema.Table0', [
-  jsql.column('column0', { type: String })
+  jsql.column('column0', { type: String, nullable: false, defaultable: false })
 ]);
 export const Table2 = jsql.table('myOwnUniqueSchema.Table2', [
-  jsql.column('column2', { type: String })
+  jsql.column('column0', { type: String, nullable: true, defaultable: false })
 ]);
 "
 `);
