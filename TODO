@@ -14,9 +14,12 @@ PostgreMote:
   ☐ implement a request method that infer select types and wrap it with Promise
     ☐ find the way to compile client for client-side without server-side code
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen schemas
-    ☐ generate views
+    ☐ use pg_catalog instead of information_schema
+    ☐ generate columns with all of the settings and types
+    ☐ full type inference with postgresql data types
     ☐ generate functions
     ☐ generate procedures
+    ✔ generate views @done
     ✔ use typescript public API instead of string compilation @done
     ☐ use project-wide prettier settings
   ☐ server
@@ -28,6 +31,10 @@ PostgreMote:
 
 DesignPad:
   ☐ implement storybook-like tool but with ability to render more than one story at a time and with a builtin visual regression testing
+
+UI state management:
+  ☐ store that generates connected components
+  ☐ finite-state machine based store
 
 Test runner:
   ☐ implement bibimbap's own test runner
