@@ -15,13 +15,8 @@ PostgreMote:
   ☐ implement a request method that infer select types and wrap it with Promise
     ☐ find the way to compile client for client-side without server-side code
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen schemas
-    ✔ use pg_catalog instead of information_schema @done
-    ✔ generate columns with all of the settings @done
     ☐ full type inference with postgresql data types
-    ✔ generate functions @done
     ☐ generate procedures
-    ✔ generate views @done
-    ✔ use typescript public API instead of string compilation @done
     ☐ use project-wide prettier settings
   ☐ server
     ☐ get rid of default schema and set up search_path to just public
@@ -41,6 +36,11 @@ Test runner:
   ☐ implement bibimbap's own test runner
 
 Archive:
+  ✔ use pg_catalog instead of information_schema @done @project(PostgreMote)
+  ✔ generate columns with all of the settings @done @project(PostgreMote)
+  ✔ generate functions @done @project(PostgreMote)
+  ✔ generate views @done @project(PostgreMote)
+  ✔ use typescript public API instead of string compilation @done @project(PostgreMote)
   ✔ generate tables @done @project(PostgreMote)
   ✔ add multiple from clauses @done @project(PostgreMote)
   ✔ implement http method @done @project(PostgreMote)
