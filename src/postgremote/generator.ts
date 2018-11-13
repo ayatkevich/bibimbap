@@ -58,59 +58,6 @@ export const generator = async (schemas: string[]) => {
       [schemas]
     );
 
-    let tableDeclarations = [];
-    for (const table of tables) {
-      let columnDeclarations = [];
-      for (const column of table.columns) {
-        columnDeclarations.push(
-          ts.createCall(
-            ts.createPropertyAccess(ts.createIdentifier('jsql'), 'column'),
-            undefined,
-            [
-              ts.createLiteral(column.columnName),
-              ts.createObjectLiteral([
-                ts.createPropertyAssignment(
-                  ts.createIdentifier('type'),
-                  ts.createIdentifier('String')
-                ),
-                ts.createPropertyAssignment(
-                  ts.createIdentifier('nullable'),
-                  ts.createIdentifier(String(!column.notNull))
-                ),
-                ts.createPropertyAssignment(
-                  ts.createIdentifier('defaultable'),
-                  ts.createIdentifier(String(column.hasDefaultValue))
-                )
-              ])
-            ]
-          )
-        );
-      }
-
-      tableDeclarations.push(
-        ts.createVariableStatement(
-          [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
-          ts.createVariableDeclarationList(
-            [
-              ts.createVariableDeclaration(
-                table.tableName,
-                undefined,
-                ts.createCall(
-                  ts.createPropertyAccess(ts.createIdentifier('jsql'), 'table'),
-                  undefined,
-                  [
-                    ts.createLiteral(`${table.schemaName}.${table.tableName}`),
-                    ts.createArrayLiteral(columnDeclarations)
-                  ]
-                )
-              )
-            ],
-            ts.NodeFlags.Const
-          )
-        )
-      );
-    }
-
     resultFile = ts.updateSourceFileNode(
       resultFile,
       ts.setTextRange(
@@ -126,7 +73,9 @@ export const generator = async (schemas: string[]) => {
             ),
             ts.createLiteral('postgremote/jsql')
           ),
-          ...tableDeclarations
+          ...tables.map(table =>
+            prepareTable(table, table.columns.map(prepareColumn))
+          )
         ]),
         resultFile.statements
       )
@@ -141,3 +90,60 @@ export const generator = async (schemas: string[]) => {
     throw error;
   }
 };
+
+function prepareTable(
+  table: {
+    tableName: string;
+    schemaName: string;
+  },
+  preparedColumns: ts.Expression[]
+) {
+  return ts.createVariableStatement(
+    [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
+    ts.createVariableDeclarationList(
+      [
+        ts.createVariableDeclaration(
+          table.tableName,
+          undefined,
+          ts.createCall(
+            ts.createPropertyAccess(ts.createIdentifier('jsql'), 'table'),
+            undefined,
+            [
+              ts.createLiteral(`${table.schemaName}.${table.tableName}`),
+              ts.createArrayLiteral(preparedColumns)
+            ]
+          )
+        )
+      ],
+      ts.NodeFlags.Const
+    )
+  );
+}
+
+function prepareColumn(column: {
+  columnName: string;
+  notNull: boolean;
+  hasDefaultValue: boolean;
+}) {
+  return ts.createCall(
+    ts.createPropertyAccess(ts.createIdentifier('jsql'), 'column'),
+    undefined,
+    [
+      ts.createLiteral(column.columnName),
+      ts.createObjectLiteral([
+        ts.createPropertyAssignment(
+          ts.createIdentifier('type'),
+          ts.createIdentifier('String')
+        ),
+        ts.createPropertyAssignment(
+          ts.createIdentifier('nullable'),
+          ts.createIdentifier(String(!column.notNull))
+        ),
+        ts.createPropertyAssignment(
+          ts.createIdentifier('defaultable'),
+          ts.createIdentifier(String(column.hasDefaultValue))
+        )
+      ])
+    ]
+  );
+}
