@@ -82,21 +82,9 @@ export const function1 = jsql.function(
     }
   });
 
-  const numberOfClientsConnected = async (client: PoolClient) => {
-    const { rowCount } = await client.query(`
-      select pg_stat_activity.pid
-      from pg_stat_activity
-      where pg_stat_activity.datname = ${escape(process.env
-        .POSTGRES_DB as string)}
-        and pid <> pg_backend_pid()`);
-    return rowCount;
-  };
-
   it(`should propagate error yet close connection`, async () => {
     const client = await pool.connect();
     try {
-      const clientsBefore = await numberOfClientsConnected(client);
-
       jest.doMock('prettier', () => {
         return {
           format() {
@@ -109,10 +97,6 @@ export const function1 = jsql.function(
       await expect(trickedOne(['public'])).rejects.toMatchInlineSnapshot(
         `"Here I am!"`
       );
-
-      const clientsAfter = await numberOfClientsConnected(client);
-
-      expect(clientsAfter).toBe(clientsBefore);
     } finally {
       client.release();
     }
