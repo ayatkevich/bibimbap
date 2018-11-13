@@ -1,7 +1,7 @@
-import ts from 'typescript';
-import prettier from 'prettier';
-import { Pool } from 'pg';
-import { escapeId } from './jsql';
+import 'typescript';
+import { Pool, PoolClient } from 'pg';
+import { generator } from './generator';
+import { escape, escapeId } from './jsql';
 
 describe('jsql code generator', () => {
   let pool: Pool;
@@ -19,8 +19,11 @@ describe('jsql code generator', () => {
     await pool.end();
   });
 
-  it(`should generate nothing if there is nothing
-      in the selected schema`, async () => {
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
+  it(`should generate javascript code out of selected schemas`, async () => {
     const schema = 'myOwnUniqueSchema';
     const client = await pool.connect();
 
@@ -45,140 +48,6 @@ describe('jsql code generator', () => {
         )
       `);
 
-      const generator = async (schemas: string[]) => {
-        let resultFile = ts.createSourceFile(
-          'someFileName.ts',
-          '',
-          ts.ScriptTarget.Latest,
-          false,
-          ts.ScriptKind.TS
-        );
-
-        const printer = ts.createPrinter({
-          newLine: ts.NewLineKind.LineFeed
-        });
-
-        const { rows: tables } = await client.query(
-          `
-          select
-            "Table"."tableName",
-            "Table"."schemaName",
-            json_agg("Columns".*) as "columns"
-          from
-            (select
-              "Class".oid as "tableId",
-              "Namespace".oid as "schemaId",
-              "Class".relname as "tableName",
-              "Namespace".nspname as "schemaName"
-            from pg_namespace as "Namespace"
-              left join pg_class as "Class"
-                on "Class".relnamespace = "Namespace".oid
-            where "Namespace".nspname = any($1::name[])
-              and "Class".relkind in ('r', 'v', 'm', 'p', 'f')) as "Table"
-            left join lateral (
-              select
-                attname as "columnName",
-                atthasdef as "hasDefaultValue",
-                attnotnull as "notNull"
-              from pg_attribute
-              where attrelid = "Table"."tableId"
-                and attnum > 0
-            ) as "Columns" on true
-          group by
-            "Table"."tableName",
-            "Table"."schemaName"
-          `,
-          [schemas]
-        );
-
-        let tableDeclarations = [];
-        for (const table of tables) {
-          let columnDeclarations = [];
-          for (const column of table.columns) {
-            columnDeclarations.push(
-              ts.createCall(
-                ts.createPropertyAccess(ts.createIdentifier('jsql'), 'column'),
-                undefined,
-                [
-                  ts.createLiteral(column.columnName),
-                  ts.createObjectLiteral([
-                    ts.createPropertyAssignment(
-                      ts.createIdentifier('type'),
-                      ts.createIdentifier('String')
-                    ),
-                    ts.createPropertyAssignment(
-                      ts.createIdentifier('nullable'),
-                      ts.createIdentifier(String(!column.notNull))
-                    ),
-                    ts.createPropertyAssignment(
-                      ts.createIdentifier('defaultable'),
-                      ts.createIdentifier(String(column.hasDefaultValue))
-                    )
-                  ])
-                ]
-              )
-            );
-          }
-
-          tableDeclarations.push(
-            ts.createVariableStatement(
-              [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
-              ts.createVariableDeclarationList(
-                [
-                  ts.createVariableDeclaration(
-                    table.tableName,
-                    undefined,
-                    ts.createCall(
-                      ts.createPropertyAccess(
-                        ts.createIdentifier('jsql'),
-                        'table'
-                      ),
-                      undefined,
-                      [
-                        ts.createLiteral(
-                          `${table.schemaName}.${table.tableName}`
-                        ),
-                        ts.createArrayLiteral(columnDeclarations)
-                      ]
-                    )
-                  )
-                ],
-                ts.NodeFlags.Const
-              )
-            )
-          );
-        }
-
-        resultFile = ts.updateSourceFileNode(
-          resultFile,
-          ts.setTextRange(
-            ts.createNodeArray([
-              ts.createImportDeclaration(
-                undefined,
-                undefined,
-                ts.createImportClause(
-                  undefined,
-                  ts.createNamedImports([
-                    ts.createImportSpecifier(
-                      undefined,
-                      ts.createIdentifier('jsql')
-                    )
-                  ])
-                ),
-                ts.createLiteral('postgremote/jsql')
-              ),
-              ...tableDeclarations
-            ]),
-            resultFile.statements
-          )
-        );
-
-        return prettier.format(printer.printFile(resultFile), {
-          singleQuote: true,
-          parser: 'typescript'
-        });
-      };
-
       // so when we run our generator we should get a typescript code
       expect(await generator([schema])).toMatchInlineSnapshot(`
 "import { jsql } from 'postgremote/jsql';
@@ -196,6 +65,42 @@ export const Table2 = jsql.table('myOwnUniqueSchema.Table2', [
     } finally {
       // drops schema
       await client.query(`drop schema if exists ${escapeId(schema)} cascade`);
+      client.release();
+    }
+  });
+
+  const numberOfClientsConnected = async (client: PoolClient) => {
+    const { rowCount } = await client.query(`
+      select pg_stat_activity.pid
+      from pg_stat_activity
+      where pg_stat_activity.datname = ${escape(process.env
+        .POSTGRES_DB as string)}
+        and pid <> pg_backend_pid()`);
+    return rowCount;
+  };
+
+  it(`should propagate error yet close connection`, async () => {
+    const client = await pool.connect();
+    try {
+      const clientsBefore = await numberOfClientsConnected(client);
+
+      jest.doMock('prettier', () => {
+        return {
+          format() {
+            throw 'Here I am!';
+          }
+        };
+      });
+      const { generator: trickedOne } = require('./generator');
+
+      await expect(trickedOne(['public'])).rejects.toMatchInlineSnapshot(
+        `"Here I am!"`
+      );
+
+      const clientsAfter = await numberOfClientsConnected(client);
+
+      expect(clientsAfter).toBe(clientsBefore);
+    } finally {
       client.release();
     }
   });
