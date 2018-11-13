@@ -26,41 +26,38 @@ export async function generator(schemas: string[]) {
     });
 
     const { rows: tables } = await client.query(
-      `
-      select
-        "Table"."tableName",
-        "Table"."schemaName",
-        json_agg("Columns".*) as "columns"
-      from
-        (select
-          "Class".oid as "tableId",
-          "Namespace".oid as "schemaId",
-          "Class".relname as "tableName",
-          "Namespace".nspname as "schemaName"
-        from pg_namespace as "Namespace"
-          left join pg_class as "Class"
-            on "Class".relnamespace = "Namespace".oid
-        where "Namespace".nspname = any($1::name[])
-          and "Class".relkind in ('r', 'v', 'm', 'p', 'f')) as "Table"
-        left join lateral (
-          select
-            attname as "columnName",
-            atthasdef as "hasDefaultValue",
-            attnotnull as "notNull"
-          from pg_attribute
-          where attrelid = "Table"."tableId"
-            and attnum > 0
-        ) as "Columns" on true
-      group by
-        "Table"."tableName",
-        "Table"."schemaName"
-      `,
+      `select
+          "Table"."tableName",
+          "Table"."schemaName",
+          json_agg("Columns".*) as "columns"
+        from
+          (select
+            "Class".oid as "tableId",
+            "Namespace".oid as "schemaId",
+            "Class".relname as "tableName",
+            "Namespace".nspname as "schemaName"
+          from pg_namespace as "Namespace"
+            left join pg_class as "Class"
+              on "Class".relnamespace = "Namespace".oid
+          where "Namespace".nspname = any($1::name[])
+            and "Class".relkind in ('r', 'v', 'm', 'p', 'f')) as "Table"
+          left join lateral (
+            select
+              attname as "columnName",
+              atthasdef as "hasDefaultValue",
+              attnotnull as "notNull"
+            from pg_attribute
+            where attrelid = "Table"."tableId"
+              and attnum > 0
+          ) as "Columns" on true
+        group by
+          "Table"."tableName",
+          "Table"."schemaName"`,
       [schemas]
     );
 
     const { rows: functions } = await client.query(
-      `
-        select
+      `select
           "Function".proname as "functionName",
           "Function".prokind as "functionKind",
           "Namespace".nspname as "schemaName"
@@ -68,8 +65,7 @@ export async function generator(schemas: string[]) {
           left join pg_proc as "Function"
             on "Function".pronamespace = "Namespace".oid
         where "Namespace".nspname = any($1::name[])
-          and "Function".prokind in ('f', 'p')
-        `,
+          and "Function".prokind in ('f', 'p')`,
       [schemas]
     );
 
