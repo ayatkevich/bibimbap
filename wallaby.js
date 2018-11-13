@@ -11,6 +11,12 @@ module.exports = function() {
 
     tests: ['src/**/*.spec.ts'],
 
+    workers: {
+      initial: 2,
+      regular: 2,
+      restart: true
+    },
+
     env: {
       type: 'node',
       runner: 'node'

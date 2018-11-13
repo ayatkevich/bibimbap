@@ -18,7 +18,7 @@ PostgreMote:
     ✔ use pg_catalog instead of information_schema @done
     ✔ generate columns with all of the settings @done
     ☐ full type inference with postgresql data types
-    ☐ generate functions
+    ✔ generate functions @done
     ☐ generate procedures
     ✔ generate views @done
     ✔ use typescript public API instead of string compilation @done

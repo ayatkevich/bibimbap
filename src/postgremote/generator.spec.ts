@@ -48,6 +48,14 @@ describe('jsql code generator', () => {
         )
       `);
 
+      await client.query(`
+        create or replace function ${escapeId(schema)}."function1"()
+          returns boolean
+        as $$ begin
+          return true;
+        end $$ language plpgsql;
+      `);
+
       // so when we run our generator we should get a typescript code
       expect(await generator([schema])).toMatchInlineSnapshot(`
 "import { jsql } from 'postgremote/jsql';
@@ -60,6 +68,11 @@ export const Table0 = jsql.table('myOwnUniqueSchema.Table0', [
 export const Table2 = jsql.table('myOwnUniqueSchema.Table2', [
   jsql.column('column0', { type: String, nullable: true, defaultable: false })
 ]);
+export const function1 = jsql.function(
+  'myOwnUniqueSchema.function1',
+  [],
+  Boolean
+);
 "
 `);
     } finally {

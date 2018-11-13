@@ -2,7 +2,7 @@ import ts from 'typescript';
 import prettier from 'prettier';
 import { Client } from 'pg';
 
-export const generator = async (schemas: string[]) => {
+export async function generator(schemas: string[]) {
   const client = new Client({
     user: process.env.POSTGRES_USER,
     host: 'localhost',
@@ -58,6 +58,21 @@ export const generator = async (schemas: string[]) => {
       [schemas]
     );
 
+    const { rows: functions } = await client.query(
+      `
+        select
+          "Function".proname as "functionName",
+          "Function".prokind as "functionKind",
+          "Namespace".nspname as "schemaName"
+        from pg_namespace as "Namespace"
+          left join pg_proc as "Function"
+            on "Function".pronamespace = "Namespace".oid
+        where "Namespace".nspname = any($1::name[])
+          and "Function".prokind in ('f', 'p')
+        `,
+      [schemas]
+    );
+
     resultFile = ts.updateSourceFileNode(
       resultFile,
       ts.setTextRange(
@@ -75,7 +90,8 @@ export const generator = async (schemas: string[]) => {
           ),
           ...tables.map(table =>
             prepareTable(table, table.columns.map(prepareColumn))
-          )
+          ),
+          ...functions.map(prepareFunction)
         ]),
         resultFile.statements
       )
@@ -89,7 +105,31 @@ export const generator = async (schemas: string[]) => {
     await client.end();
     throw error;
   }
-};
+}
+
+function prepareFunction(func: { functionName: string; schemaName: string }) {
+  return ts.createVariableStatement(
+    [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
+    ts.createVariableDeclarationList(
+      [
+        ts.createVariableDeclaration(
+          func.functionName,
+          undefined,
+          ts.createCall(
+            ts.createPropertyAccess(ts.createIdentifier('jsql'), 'function'),
+            undefined,
+            [
+              ts.createLiteral(`${func.schemaName}.${func.functionName}`),
+              ts.createArrayLiteral(),
+              ts.createIdentifier('Boolean')
+            ]
+          )
+        )
+      ],
+      ts.NodeFlags.Const
+    )
+  );
+}
 
 function prepareTable(
   table: {
