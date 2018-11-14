@@ -88,7 +88,7 @@ describe('postgremote server', () => {
     it('should make a query and return result as JSON', async () => {
       const client = await pool.connect();
 
-      const TestTable = jsql.table('TestTable', [
+      const TestTable = jsql.table('public.TestTable', [
         jsql.column('name', { type: String })
       ]);
 
@@ -122,7 +122,7 @@ describe('postgremote server', () => {
         when there is no valid token provided`, async () => {
       const client = await pool.connect();
 
-      const TestTable = jsql.table('TestTable', [
+      const TestTable = jsql.table('public.TestTable', [
         jsql.column('name', { type: String })
       ]);
 
@@ -159,7 +159,7 @@ describe('postgremote server', () => {
       // these permissions should apply in order to make this test
 
       // just a simple table with default name
-      const TestTable = jsql.table('TestTable', [
+      const TestTable = jsql.table('public.TestTable', [
         jsql.column('name', { type: String })
       ]);
 
@@ -228,11 +228,11 @@ describe('postgremote server', () => {
 
       try {
         await client.query(`
-          create or replace function login() returns ${escapeId(
+          create or replace function login() returns public.${escapeId(
             tokenType
           )} as $$
           declare
-            result ${escapeId(tokenType)};
+            result public.${escapeId(tokenType)};
           begin
             select 'roleName' as sub into result;
             return result;
@@ -244,12 +244,12 @@ describe('postgremote server', () => {
         // of token type, because postgremote should not allow to work directly
         // with token, it is going to be set up using http only cookies
         // so the only value except errors can be just true
-        const login = jsql.function('login', [], Boolean);
+        const login = jsql.function('public.login', [], Boolean);
 
         const response = await request(app)
           .post(endpoint)
-          .send(login({}).toJSQL())
-          .expect(200);
+          .send(login({}).toJSQL());
+        console.log(response.error);
 
         expect(response.header['set-cookie'][0]).toEqual(
           expect.stringContaining(
@@ -286,7 +286,7 @@ describe('postgremote server', () => {
     });
   });
 
-  describe('different schema', () => {
+  describe('different schemas', () => {
     const schema = 'someSchemaToUse';
     beforeAll(async () => {
       await setupTestEnvironment();
@@ -298,7 +298,6 @@ describe('postgremote server', () => {
       app.post(
         endpoint,
         await setup({
-          schema,
           defaultRole,
           secret,
           tokenType,
@@ -316,19 +315,19 @@ describe('postgremote server', () => {
     it('should work with different schemas', async () => {
       const client = await pool.connect();
 
-      const TestTable = jsql.table(`TestTable`, [
+      const TestTable = jsql.table(`${schema}.TestTable`, [
         jsql.column('name', { type: String })
       ]);
 
-      const tableName = escapeId([schema, TestTable.$$].join('.'));
-
       try {
         await client.query(`create schema ${escapeId(schema)}`);
-        await client.query(`create table ${tableName} (name text)`);
+        await client.query(
+          `create table ${escapeId(TestTable.$$)} (name text)`
+        );
         await client.query(`grant usage
           on schema ${escapeId(schema)} to ${escapeId(defaultRole)}`);
         await client.query(`grant all privileges
-          on ${tableName} to ${escapeId(defaultRole)}`);
+          on ${escapeId(TestTable.$$)} to ${escapeId(defaultRole)}`);
 
         await request(app)
           .post(endpoint)
@@ -340,8 +339,7 @@ describe('postgremote server', () => {
           .send(jsql.select([TestTable['*']], { from: [TestTable] }).toJSQL())
           .expect(200);
       } finally {
-        await client.query(`drop table ${tableName}`);
-        await client.query(`drop schema ${escapeId(schema)}`);
+        await client.query(`drop schema if exists ${escapeId(schema)} cascade`);
         client.release();
       }
     });

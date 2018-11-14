@@ -23,7 +23,6 @@ type PostgremoteSettings = {
   /**
    * if there is no schema public scheme will be used by default
    */
-  schema?: string;
   defaultRole: string;
   secret: string;
   tokenType: string;
@@ -91,9 +90,7 @@ export async function setup(settings: PostgremoteSettings) {
         };
         role = sub;
       }
-      await client.query(
-        `set search_path to ${escapeId(settings.schema || 'public')}`
-      );
+      await client.query(`set search_path to ''`);
       await client.query(`set role ${escapeId(role)}`);
 
       const response = await client.query(jsql(req.body as Query));
@@ -117,7 +114,7 @@ export async function setup(settings: PostgremoteSettings) {
       res.send(result);
     } catch (error) {
       res.status(error.code === '42501' ? 403 : 500);
-      res.send({code: error.code, message: error.message});
+      res.send({ code: error.code, message: error.message });
     } finally {
       client.release();
     }

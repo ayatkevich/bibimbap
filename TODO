@@ -19,7 +19,7 @@ PostgreMote:
     ☐ generate procedures
     ☐ use project-wide prettier settings
   ☐ server
-    ☐ get rid of default schema and set up search_path to just public
+    ✔ get rid of default schema and set up search_path to nothing @done
   ☐ implement database migration tool for PostgreMote with auto code generation
   ☐ implement database testing tool PostgreMote with all the generated types used so we could make a static analysis over the tests
   ☐ implement postgresql code coverage tool
