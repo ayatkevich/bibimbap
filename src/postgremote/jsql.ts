@@ -12,7 +12,6 @@ type ColumnSettings<
   DataNullable extends boolean | undefined
 > = {
   type: DataType;
-  defaultValue?: ReturnType<DataType>;
   nullable?: DataNullable;
   defaultable?: DataDefaultable;
 };
@@ -73,7 +72,7 @@ export type Table<
       TableName,
       ColumnName,
       Columns['columnSettings']['type'],
-      Columns['columnSettings']['defaultValue'],
+      Columns['columnSettings']['defaultable'],
       Columns['columnSettings']['nullable']
     >
     & {
@@ -83,7 +82,7 @@ export type Table<
         TableName,
         ColumnName,
         Columns['columnSettings']['type'],
-        Columns['columnSettings']['defaultValue'],
+        Columns['columnSettings']['defaultable'],
         Columns['columnSettings']['nullable'],
         AliasName
       >;
@@ -384,7 +383,7 @@ jsql.table = <
       TableName,
       Column['columnName'],
       Column['columnSettings']['type'],
-      Column['columnSettings']['defaultValue'],
+      Column['columnSettings']['defaultable'],
       Column['columnSettings']['nullable']
     > = {
       $: JSQLType.COLUMN,

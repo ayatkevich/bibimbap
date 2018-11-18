@@ -1,20 +1,6 @@
 import { jsql } from 'postgremote/jsql';
 
 /**
- * Table and column tests
- */
-
-// default values types
-jsql.table('TestTable', [
-  // type of string but default value is boolean
-  jsql.column('testColumn1', { type: String, defaultValue: true }),
-  // type of number but default value is string
-  jsql.column('testColumn2', { type: Number, defaultValue: '2' }),
-  // type of boolean but default value is number
-  jsql.column('testColumn3', { type: Boolean, defaultValue: 0 })
-]);
-
-/**
  * Insert tests
  */
 
@@ -22,12 +8,10 @@ const TestTable0 = jsql.table('TestTable', [
   jsql.column('isNullable', { type: Boolean, nullable: true }),
   jsql.column('withDefault', {
     type: Number,
-    defaultValue: 2,
     defaultable: true
   }),
   jsql.column('withDefaultAndNullable', {
     type: String,
-    defaultValue: 'string',
     defaultable: true,
     nullable: true
   }),

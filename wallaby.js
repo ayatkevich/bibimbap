@@ -4,6 +4,7 @@ module.exports = function() {
 
     files: [
       { pattern: 'node_modules/@types/**/*', instrument: false },
+      { pattern: 'src/**/*.snap', instrument: false },
       'tsconfig.json',
       'src/**/*.ts',
       '!src/**/*.spec.ts'
@@ -12,8 +13,8 @@ module.exports = function() {
     tests: ['src/**/*.spec.ts'],
 
     workers: {
-      initial: 2,
-      regular: 2,
+      initial: 4,
+      regular: 4,
       restart: true
     },
 
