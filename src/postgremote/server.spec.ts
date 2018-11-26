@@ -249,7 +249,6 @@ describe('postgremote server', () => {
         const response = await request(app)
           .post(endpoint)
           .send(login({}).toJSQL());
-        console.log(response.error);
 
         expect(response.header['set-cookie'][0]).toEqual(
           expect.stringContaining(

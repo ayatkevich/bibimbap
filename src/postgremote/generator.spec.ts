@@ -1,7 +1,7 @@
+import { Pool } from 'pg';
 import 'typescript';
-import { Pool, PoolClient } from 'pg';
 import { generator } from './generator';
-import { escape, escapeId } from './jsql';
+import { escapeId } from './jsql';
 
 describe('jsql code generator', () => {
   let pool: Pool;
