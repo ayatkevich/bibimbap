@@ -71,9 +71,9 @@ export type Table<
     [ColumnName in Columns['columnName']]: ColumnLinked<
       TableName,
       ColumnName,
-      Columns['columnSettings']['type'],
-      Columns['columnSettings']['defaultable'],
-      Columns['columnSettings']['nullable']
+      NamedColumn<ColumnName, Columns>['columnSettings']['type'],
+      NamedColumn<ColumnName, Columns>['columnSettings']['defaultable'],
+      NamedColumn<ColumnName, Columns>['columnSettings']['nullable']
     >
     & {
       as<AliasName extends string>(
@@ -81,9 +81,9 @@ export type Table<
       ): ColumnLinked<
         TableName,
         ColumnName,
-        Columns['columnSettings']['type'],
-        Columns['columnSettings']['defaultable'],
-        Columns['columnSettings']['nullable'],
+        NamedColumn<ColumnName, Columns>['columnSettings']['type'],
+        NamedColumn<ColumnName, Columns>['columnSettings']['defaultable'],
+        NamedColumn<ColumnName, Columns>['columnSettings']['nullable'],
         AliasName
       >;
     }
