@@ -7,10 +7,9 @@ Chores:
 PostgreMote:
   ☐ implement an SQL-like DSL
     ☐ change all operands to lower case to follow the sql formatting style
-    ✔ add where clause @done
+    ☐ implement complete logic expression traversing
     ☐ implement procedure
     ☐ add joins
-    ✔ get rid of defaulValue for columns, because they are supposed to be generated from database @done
     ☐ improve jsql with runtime guards
     ☐ get rid of sqlstring dependency
   ☐ implement a request method that infer select types and wrap it with Promise
@@ -19,24 +18,49 @@ PostgreMote:
     ☐ full type inference with postgresql data types
     ☐ generate procedures
     ☐ use project-wide prettier settings
-  ☐ server
-    ✔ get rid of default schema and set up search_path to nothing @done
   ☐ implement database migration tool for PostgreMote with auto code generation
   ☐ implement database testing tool PostgreMote with all the generated types used so we could make a static analysis over the tests
   ☐ implement postgresql code coverage tool
   ☐ implement database management interface that simplifies working with migrations and code coverage
 
 DesignPad:
-  ☐ implement storybook-like tool but with ability to render more than one story at a time and with a builtin visual regression testing
-
-UI state management:
-  ☐ store that generates connected components
-  ☐ finite-state machine based store
+  ☐ implement .design.ts file format library for declaring frames to render
+  ☐ build out runner that starts parcel and puppeteer and collects all the .design.ts files
+  ☐ implement main app that renders frames one next to another
+  ☐ implement navigation between frames using arrows
+  ☐ make puppeteer split all the frames between maximum amount of openned tabs
+  ☐ make a screenshot of each frame on parcel change
+  ☐ compare new screenshot with previous version
+  ☐ warn main app with list of visual diffs
+  ☐ add ability to set visible frame as wip
+  ☐ automatically disable wip for frames that aren't visible
+  ☐ exclude wip frames from snapshot comparison
+  ☐ add capability to make screenshots using selenium driver and browserstack for cross-browser experience
 
 Test runner:
-  ☐ implement bibimbap's own test runner
+  ☐ implement .test.ts file format library for declaring tests to run
+  ☐ use designpad's runner and existing instance of puppeteer to run test files
+  ☐ provide way to mark test files as server-side only
+  ☐ run server-side only tests using deisgnpad's node executable process
+  ☐ provide way to mark test files as multi-thread ready
+  ☐ run mutl-thread ready test suites in parallel both in puppeteer and node test runner
+  ☐ collect js coverage both in puppeteer and node test runner
+  ☐ combine puppeteer and node test runner coverage reports
+  ☐ notify user about uncovered parts of the code
+
+UI state management:
+  ☐ finite-state machine based store
+  ☐ render state diagram in designpad
+  ☐ render app states within diagram
+
+Business logic module:
+  ☐ implement test-saga like module for redux-saga testing but with capability to render flowcharts based on them
+  ☐ implement black-box testing of sagas
 
 Archive:
+  ✔ add where clause @done @project(PostgreMote)
+  ✔ get rid of defaulValue for columns, because they are supposed to be generated from database @done @project(PostgreMote)
+  ✔ get rid of default schema and set up search_path to nothing @done @project(PostgreMote)
   ✔ use pg_catalog instead of information_schema @done @project(PostgreMote)
   ✔ generate columns with all of the settings @done @project(PostgreMote)
   ✔ generate functions @done @project(PostgreMote)
