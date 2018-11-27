@@ -177,6 +177,23 @@ describe(`DSL`, () => {
         values: []
       });
     });
+
+    test(`SELECT "User"."name" FROM "User" WHERE "User"."email" = $1`, () => {
+      const User = jsql.table('User', [
+        jsql.column('name', { type: String }),
+        jsql.column('email', { type: String })
+      ]);
+
+      expect(
+        jsql.select([User.name], {
+          from: [User],
+          where: jsql.equals(User.email, 'name@example.com')
+        }).toQueryObject()
+      ).toEqual({
+        text: `SELECT "User"."name" FROM "User" WHERE "User"."email" = $1`,
+        values: ['name@example.com']
+      });
+    });
   });
 
   describe(`insert`, () => {

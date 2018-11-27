@@ -54,7 +54,7 @@ type AstersikColumns<
 
 // prettier-ignore
 type UnpackedColumns<Query extends JSQLQuery>
-  = Query extends Select<infer Params, infer From>
+  = Query extends Select<infer Params, infer From, any>
     ? AstersikColumns<Params, From> : never;
 
 type QueryResultType<Columns> = {

@@ -49,6 +49,22 @@ export type ColumnLinked<
   columnSettings: ColumnSettings<DataType, DataDefaultable, DataNullable>;
 };
 
+type ColumnType<
+  Column extends
+    | ColumnFree<any, any, any, any>
+    | ColumnLinked<any, any, any, any, any>
+> = ReturnType<Column['columnSettings']['type']>;
+
+type NullableColumnType<
+  Column extends
+    | ColumnFree<any, any, any, any>
+    | ColumnLinked<any, any, any, any, any>
+> = Column extends ColumnFree<any, any, any, true>
+  ? null | ColumnType<Column>
+  : Column extends ColumnLinked<any, any, any, any, true>
+  ? null | ColumnType<Column>
+  : ColumnType<Column>;
+
 export type ColumnAsterisk<TableName extends string> = {
   $: JSQLType.COLUMN;
   kind: ColumnKind.ASTERISK;
@@ -128,29 +144,35 @@ type NamedColumn<
   Columns
 > = Columns extends ColumnFree<ColumnName, any, any, any> ? Columns : never;
 
-type ColumnType<
+type NamedColumnType<
   ColumnName extends string,
   Columns extends ColumnFree<any, any, any, any>
-> = ReturnType<NamedColumn<ColumnName, Columns>['columnSettings']['type']>;
+> = ColumnType<NamedColumn<ColumnName, Columns>>;
 
 // prettier-ignore
 type PropertiesFromColumns<Args extends ColumnFree<any, any, any, any>> =
   & {
     [ArgName in NullableColumns<Args>['columnName']]+?:
-      ColumnType<ArgName, Args>
+      NamedColumnType<ArgName, Args>
   }
   & {
     [ArgName in DefaultableColumns<Args>['columnName']]+?:
-      ColumnType<ArgName, Args>
+      NamedColumnType<ArgName, Args>
   }
   & {
     [ArgName in RequiredColumns<
       Args,
       NullableColumns<Args> | DefaultableColumns<Args>
-    >['columnName']]: ColumnType<ArgName, Args>
+    >['columnName']]: NamedColumnType<ArgName, Args>
   };
 
 type TableProperties<OfTable> = PropertiesFromColumns<UnpackedColumns<OfTable>>;
+
+export enum QueryKind {
+  SELECT,
+  INSERT,
+  EXECUTE
+}
 
 export type SelectKind =
   | ColumnAsterisk<any>
@@ -159,16 +181,27 @@ export type SelectKind =
 
 export type FromKind = Table<any, any>;
 
-export enum QueryKind {
-  SELECT,
-  INSERT,
-  EXECUTE
+export enum LogicExpressionKind {
+  EQUALITY = ' = '
 }
 
-export interface Select<Params extends SelectKind, From extends FromKind> {
+export type LogicExpressionEquality<Left, Right> = {
+  kind: LogicExpressionKind.EQUALITY;
+  left: Left;
+  right: Right;
+};
+
+export type WhereKind = LogicExpressionEquality<any, any>;
+
+export interface Select<
+  Params extends SelectKind,
+  From extends FromKind,
+  Where extends WhereKind
+> {
   kind: QueryKind.SELECT;
   select: Params[];
   from: From[];
+  where?: Where;
 }
 
 enum InsertKind {
@@ -203,7 +236,7 @@ type QueryObject = {
   values: any[];
 };
 
-export type Query = Select<any, any> | Insert<any> | Execute;
+export type Query = Select<any, any, any> | Insert<any> | Execute;
 
 export abstract class QueryGenerator<T extends Query> {
   abstract toJSQL(): T;
@@ -259,7 +292,30 @@ function* extractTableColumns(
   }
 }
 
-const jsqlCompileSelect = (query: Select<SelectKind, FromKind>) => {
+const isColumnLinked = (
+  value: any
+): value is ColumnLinked<any, any, any, any, any> =>
+  value && value.$ === JSQLType.COLUMN && value.kind === ColumnKind.LINKED;
+
+const traverseLogicTree = (tree: WhereKind, variableIndex = 1) => {
+  const values: any[] = [];
+  return {
+    clause: [tree.left, tree.right]
+      .map(branch => {
+        if (isColumnLinked(branch)) {
+          return escapeId(
+            `${branch.tableName}.${branch.aliasName || branch.columnName}`
+          );
+        }
+        values.push(branch);
+        return `$${variableIndex++}`;
+      })
+      .join(tree.kind),
+    values
+  };
+};
+
+const jsqlCompileSelect = (query: Select<SelectKind, FromKind, WhereKind>) => {
   if (!query.from) {
     throw new JSQLError(`FROM statement is required`);
   }
@@ -291,9 +347,17 @@ const jsqlCompileSelect = (query: Select<SelectKind, FromKind>) => {
     })
     .join(', ');
 
+  let values: any[] = [];
+  let whereExpression = '';
+  if (query.where) {
+    const result = traverseLogicTree(query.where);
+    values = result.values;
+    whereExpression = ` WHERE ${result.clause}`;
+  }
+
   return {
-    text: `SELECT ${selectExpression} FROM ${fromExpression}`,
-    values: []
+    text: `SELECT ${selectExpression} FROM ${fromExpression}${whereExpression}`,
+    values
   };
 };
 
@@ -363,12 +427,12 @@ export function jsql(query: Query): QueryObject {
 
 jsql.table = <
   TableName extends string,
-  Column extends ColumnFree<any, any, any, any>
+  Columns extends ColumnFree<any, any, any, any>
 >(
   tableName: TableName,
-  columns: Column[]
-): Table<TableName, Column> => {
-  const result = { $: JSQLType.TABLE } as Table<TableName, Column>;
+  columns: Columns[]
+): Table<TableName, Columns> => {
+  const result = { $: JSQLType.TABLE } as Table<TableName, Columns>;
 
   result['$$'] = tableName;
 
@@ -381,10 +445,10 @@ jsql.table = <
   for (const column of columns) {
     const columnLinked: ColumnLinked<
       TableName,
-      Column['columnName'],
-      Column['columnSettings']['type'],
-      Column['columnSettings']['defaultable'],
-      Column['columnSettings']['nullable']
+      Columns['columnName'],
+      Columns['columnSettings']['type'],
+      Columns['columnSettings']['defaultable'],
+      Columns['columnSettings']['nullable']
     > = {
       $: JSQLType.COLUMN,
       kind: ColumnKind.LINKED,
@@ -449,14 +513,30 @@ jsql.function = <
   return executor;
 };
 
-jsql.select = <Params extends SelectKind, From extends FromKind>(
+jsql.equals = <Column extends ColumnLinked<any, any, any, any, any>>(
+  column: Column,
+  value: NullableColumnType<Column>
+): LogicExpressionEquality<Column, NullableColumnType<Column>> => ({
+  kind: LogicExpressionKind.EQUALITY,
+  left: column,
+  right: value
+});
+
+jsql.select = <
+  Params extends SelectKind,
+  From extends FromKind,
+  Where extends WhereKind
+>(
   params: Params[],
   clause: {
     from: From[];
+    where?: Where;
   }
 ) =>
-  new class SelectGenerator extends QueryGenerator<Select<Params, From>> {
-    toJSQL(): Select<Params, From> {
+  new class SelectGenerator extends QueryGenerator<
+    Select<Params, From, Where>
+  > {
+    toJSQL(): Select<Params, From, Where> {
       if (!clause || !clause.from) {
         throw new JSQLError(
           `You should setup from where you want to do select`
@@ -466,7 +546,8 @@ jsql.select = <Params extends SelectKind, From extends FromKind>(
       return {
         kind: QueryKind.SELECT,
         select: params,
-        from: clause.from
+        from: clause.from,
+        where: clause.where
       };
     }
   }();

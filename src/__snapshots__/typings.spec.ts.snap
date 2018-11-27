@@ -26,6 +26,12 @@ exports[`check typings: src/typings-tests/jsql.ts 6`] = `"Type 'string' is not a
 
 exports[`check typings: src/typings-tests/jsql.ts 7`] = `"Type 'string' is not assignable to type 'number | undefined'."`;
 
+exports[`check typings: src/typings-tests/jsql.ts 8`] = `"Argument of type '1' is not assignable to parameter of type 'string'."`;
+
+exports[`check typings: src/typings-tests/jsql.ts 9`] = `"Argument of type 'null' is not assignable to parameter of type 'string'."`;
+
+exports[`check typings: src/typings-tests/jsql.ts 10`] = `"Argument of type 'undefined' is not assignable to parameter of type 'string'."`;
+
 exports[`check typings: src/typings-tests/postgremote-client.ts 1`] = `"Property 'c2' does not exist on type 'QueryResultType<ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, \\"\\"> & { as<AliasName extends string>(aliasName: AliasName): ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, AliasName>; }>'."`;
 
 exports[`check typings: src/typings-tests/postgremote-client.ts 2`] = `"Property 'thereIsNoSuchAColumnHere' does not exist on type 'QueryResultType<ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, \\"\\"> & { as<AliasName extends string>(aliasName: AliasName): ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, AliasName>; }>'."`;

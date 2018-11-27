@@ -6,10 +6,11 @@ Chores:
 
 PostgreMote:
   ☐ implement an SQL-like DSL
-    ☐ add where clause
+    ☐ change all operands to lower case to follow the sql formatting style
+    ✔ add where clause @done
     ☐ implement procedure
     ☐ add joins
-    ☐ get rid of defaulValue for columns, because they are supposed to be generated from database
+    ✔ get rid of defaulValue for columns, because they are supposed to be generated from database @done
     ☐ improve jsql with runtime guards
     ☐ get rid of sqlstring dependency
   ☐ implement a request method that infer select types and wrap it with Promise
