@@ -70,49 +70,55 @@ That is how it could look like:
  * of the exposed database schema
  */
 
-const selectComponentWithManufacturers = sql
-  .select(
-    Data.Component,
-    {manufacturers: sql.array(Data.Manufacturer)}
-  )
-  .from(
-    Data.Component,
-    sql.from
-      .leftOuterJoin(Data.ComponentManufacturer)
-      .on(Data.ComponentManufacturer.componentId
-        .equals(Data.Component.id)),
-    sql.from
-      .leftOuterJoin(Data.Manufacturer)
-      .on(Data.ComponentManufacturer.manufacturerId
-        .equals(Data.Manufacturer.id))
-  )
-  .groupBy(Data.Component.id);
+const ComponentRow = jsql.subQuery(
+  jsql.select(
+    [
+      Data.Component['*'],
+      jsql.array(Data.Manufacturer['*'], { as: 'manufacturers' })
+    ],
+    {
+      from: [
+        Data.Component,
+        jsql.leftOuterJoin(Data.ComponentManufacturer, {
+          on: jsql.equals(
+            Data.ComponentManufacturer.componentId,
+            Data.Component.id
+          )
+        }),
+        jsql.leftOuterJoin(Data.Manufacturer, {
+          on: jsql.equals(
+            Data.ComponentManufacturer.manufacturerId,
+            Data.Manufacturer.id
+          )
+        })
+      ],
+      groupBy: [Data.Component.id]
+    }
+  ),
+  { as: 'ComponentRow' }
+);
 
-const ComponentRow = sql
-  .subQuery(selectComponentWithManufacturers)
-  .as('ComponentRow');
-
-const selectDeviceDetails = (deviceId: Data.Device.id) =>
-  sql
-    .select(Data.Device, {components: sql.array(ComponentRow)})
-    .from(
+const selectDeviceDetails = (deviceId: ColumnType<typeof Data.Device.id>) =>
+  jsql.select([Data.Device, jsql.array(ComponentRow)], {
+    from: [
       Data.Device,
-      sql.from
-        .leftOuterJoin(Data.DeviceComponent)
-        .on(Data.DeviceComponent.deviceId.equals(Data.Device.id)),
-      sql.from
-        .leftOuterJoin(ComponentRow)
-        .on(ComponentRow.id.equals(Data.DeviceComponent.componentId))
-      )
-    .groupBy(Data.Device.id)
-    .where(Data.Device.id.equals(deviceId))
-    .limit(1)
-    .unfold();
+      jsql.leftOuterJoin(Data.DeviceComponent, {
+        on: jsql.equals(Data.DeviceComponent.deviceId, Data.Device.id)
+      }),
+      jsql.leftOuterJoin(ComponentRow, {
+        on: jsql.equals(ComponentRow.id, Data.DeviceComponent.componentId)
+      })
+    ],
+    groupBy: [Data.Device.id],
+    where: jsql.equals(Data.Device.id, deviceId),
+    limit: [1]
+  });
 ```
 
 ### PostgreMote
 
 PostgreMote exposes several tools:
+
 1. PostgreSQL web interface
 2. Migration tool
 3. JavaScript, TypeScript, and PgSQL code generation tools
