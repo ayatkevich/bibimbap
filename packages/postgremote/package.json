@@ -1,0 +1,25 @@
+{
+  "name": "@bibimbap/postgremote",
+  "version": "0.0.0",
+  "description": "postgremote exposes your database to the world keeping it secure and provides you with statically typed SQL-like looking DSL",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayatkevich/bibimbap.git"
+  },
+  "author": "Alexander Yatkevich <ayatkevich@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ayatkevich/bibimbap/issues"
+  },
+  "homepage": "https://github.com/ayatkevich/bibimbap#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
+    "pg": "^7.6.1",
+    "sqlstring": "^2.3.1",
+    "superagent": "^4.0.0"
+  }
+}

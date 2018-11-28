@@ -5,11 +5,11 @@ import ts from 'typescript';
 test('check typings', () => {
   const program = ts.createProgram(
     fs
-      .readdirSync('./src/postgremote/typings-tests')
+      .readdirSync('./packages/postgremote/typings-tests')
       .filter(file => file.endsWith('.ts'))
-      .map(file => path.join('./src/postgremote/typings-tests', file)),
+      .map(file => path.join('./packages/postgremote/typings-tests', file)),
     {
-      baseUrl: './src',
+      baseUrl: './packages',
       declaration: false,
       noEmit: true,
       downlevelIteration: true,

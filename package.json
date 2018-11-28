@@ -1,8 +1,6 @@
 {
-  "name": "bibimbap",
-  "version": "0.1.0",
+  "private": true,
   "description": "Bibimbap — is my favorite Korean dish. It is a warm steamed white rice on the bottom of a bowl, and namul (sautéed and seasoned vegetables), gochujang (hot pepper soybean paste), and sesame oil over the rice. You have to mix it well with a spoon just before eating.",
-  "main": "index.js",
   "scripts": {
     "test": "POSTGRES_USER=postgremote POSTGRES_DB=postgremote POSTGRES_PASSWORD= jest --watchAll --coverage --verbose false -i",
     "db": "PGUSER=postgremote PGDATABASE=postgremote PGPASSWORD= psql"
@@ -32,22 +30,13 @@
     "@types/superagent": "^3.8.4",
     "@types/supertest": "^2.0.6",
     "jest": "^23.6.0",
+    "lerna": "^3.5.0",
     "parcel-bundler": "^1.10.3",
     "prettier": "^1.15.2",
     "supertest": "^3.3.0",
     "ts-jest": "^23.10.5",
     "tslint": "^5.11.0",
     "typescript": "^3.1.6"
-  },
-  "dependencies": {
-    "body-parser": "^1.18.3",
-    "cookie-parser": "^1.4.3",
-    "express": "^4.16.4",
-    "jsonwebtoken": "^8.4.0",
-    "pg": "^7.6.1",
-    "react": "^16.6.3",
-    "sqlstring": "^2.3.1",
-    "superagent": "^4.0.0"
   },
   "prettier": {
     "singleQuote": true

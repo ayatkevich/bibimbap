@@ -1,0 +1,19 @@
+{
+  "name": "@bibimbap/designpad",
+  "version": "0.0.0",
+  "description": "designpad is a tool to run all your tests and render your components in isolation",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayatkevich/bibimbap.git"
+  },
+  "author": "Alexander Yatkevich <ayatkevich@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ayatkevich/bibimbap/issues"
+  },
+  "homepage": "https://github.com/ayatkevich/bibimbap#readme",
+  "dependencies": {
+    "react": "^16.6.3"
+  }
+}
