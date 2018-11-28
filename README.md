@@ -99,7 +99,7 @@ const ComponentRow = jsql.subQuery(
 );
 
 const selectDeviceDetails = (deviceId: ColumnType<typeof Data.Device.id>) =>
-  jsql.select([Data.Device, jsql.array(ComponentRow)], {
+  jsql.select([Data.Device['*'], jsql.array(ComponentRow['*'])], {
     from: [
       Data.Device,
       jsql.leftOuterJoin(Data.DeviceComponent, {
