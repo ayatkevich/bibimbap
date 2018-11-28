@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 1`] = `
+"Argument of type '{}' is not assignable to parameter of type 'PropertiesFromColumns<ColumnFree<\\"isNullable\\", BooleanConstructor, boolean | undefined, true> | ColumnFree<\\"withDefault\\", NumberConstructor, true, boolean | undefined> | ColumnFree<\\"withDefaultAndNullable\\", StringConstructor, true, true> | ColumnFree<...>>'.
+  Type '{}' is not assignable to type '{ required: string; }'.
+    Property 'required' is missing in type '{}'."
+`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 2`] = `
+"Argument of type '{ isNullable: false; }' is not assignable to parameter of type 'PropertiesFromColumns<ColumnFree<\\"isNullable\\", BooleanConstructor, boolean | undefined, true> | ColumnFree<\\"withDefault\\", NumberConstructor, true, boolean | undefined> | ColumnFree<\\"withDefaultAndNullable\\", StringConstructor, true, true> | ColumnFree<...>>'.
+  Type '{ isNullable: false; }' is not assignable to type '{ required: string; }'.
+    Property 'required' is missing in type '{ isNullable: false; }'."
+`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 3`] = `"Expected 1 arguments, but got 0."`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 4`] = `
+"Argument of type '{}' is not assignable to parameter of type 'PropertiesFromColumns<ColumnFree<\\"arg\\", StringConstructor, boolean | undefined, boolean | undefined> | ColumnFree<\\"nullable\\", NumberConstructor, boolean | undefined, true> | ColumnFree<...>>'.
+  Type '{}' is not assignable to type '{ arg: string; }'.
+    Property 'arg' is missing in type '{}'."
+`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 5`] = `"Type 'number' is not assignable to type 'string'."`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 6`] = `"Type 'string' is not assignable to type 'boolean | undefined'."`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 7`] = `"Type 'string' is not assignable to type 'number | undefined'."`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 8`] = `"Argument of type '1' is not assignable to parameter of type 'string'."`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 9`] = `"Argument of type 'null' is not assignable to parameter of type 'string'."`;
+
+exports[`check typings: src/postgremote/typings-tests/jsql.ts 10`] = `"Argument of type 'undefined' is not assignable to parameter of type 'string'."`;
+
+exports[`check typings: src/postgremote/typings-tests/postgremote-client.ts 1`] = `"Property 'c2' does not exist on type 'QueryResultType<ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, \\"\\"> & { as<AliasName extends string>(aliasName: AliasName): ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, AliasName>; }>'."`;
+
+exports[`check typings: src/postgremote/typings-tests/postgremote-client.ts 2`] = `"Property 'thereIsNoSuchAColumnHere' does not exist on type 'QueryResultType<ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, \\"\\"> & { as<AliasName extends string>(aliasName: AliasName): ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, AliasName>; }>'."`;
+
+exports[`check typings: src/postgremote/typings-tests/postgremote-client.ts 3`] = `"Property 'thereIsNoSuchAColumnHere' does not exist on type 'QueryResultType<(ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, \\"\\"> & { as<AliasName extends string>(aliasName: AliasName): ColumnLinked<\\"MyTable1\\", \\"c1\\", StringConstructor, boolean | undefined, boolean | undefined, AliasName>; }) | (ColumnLinked<...> & { ...; })>'."`;
+
+exports[`check typings: src/postgremote/typings-tests/postgremote-client.ts 4`] = `"Property 'thereIsNoSuchAColumnHere' does not exist on type 'QueryResultType<ColumnFree<\\"c1\\", StringConstructor, boolean | undefined, boolean | undefined> | ColumnFree<\\"c2\\", StringConstructor, boolean | undefined, boolean | undefined> | ColumnLinked<...>>'."`;
