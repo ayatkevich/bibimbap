@@ -23,6 +23,10 @@ PostgreMote:
   ☐ implement postgresql code coverage tool
   ☐ implement database management interface that simplifies working with migrations and code coverage
 
+Create Bibimbap App:
+  ☐ add @bibimbap/create package
+  ☐ configure create package to initialize project with all requirements and default directory structure
+
 DesignPad:
   ✔ implement .design.ts file format library for declaring frames to render @done
   ☐ build out runner that starts parcel and puppeteer and collects all the .design.ts files
