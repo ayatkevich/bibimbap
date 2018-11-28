@@ -1,11 +1,11 @@
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import getPort from 'get-port';
 import { Server } from 'http';
+import { AddressInfo } from 'net';
 import { Pool } from 'pg';
 import { config, databaseConnectionPool, exec, serverEndpoint } from './client';
-import { jsql, escapeId } from './jsql';
+import { escapeId, jsql } from './jsql';
 import { setup, teardown } from './server';
 
 describe(`postgremote client pool`, () => {
@@ -101,8 +101,10 @@ describe(`postgremote client pool`, () => {
       await setupTestEnvironment();
 
       const app = express();
-      port = await getPort();
-      server = app.listen(port);
+      server = (await new Promise(
+        resolve => (server = app.listen(0, () => resolve(server)))
+      )) as Server;
+      port = (server.address() as AddressInfo).port;
       app.use(cookieParser());
       app.use(bodyParser.json());
       app.post(
