@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "baseUrl": "./src",
     "declaration": false,
     "noEmit": true,

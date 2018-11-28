@@ -24,7 +24,7 @@ PostgreMote:
   ☐ implement database management interface that simplifies working with migrations and code coverage
 
 DesignPad:
-  ☐ implement .design.ts file format library for declaring frames to render
+  ✔ implement .design.ts file format library for declaring frames to render @done
   ☐ build out runner that starts parcel and puppeteer and collects all the .design.ts files
   ☐ implement main app that renders frames one next to another
   ☐ implement navigation between frames using arrows
