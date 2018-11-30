@@ -7,6 +7,9 @@ import {
   Timestamp
 } from './jsql';
 
+const removeSpaces = (string: string) =>
+  string.replace(/\s\s+/gm, ' ').replace(/(\(\s|\s\))/g, match => match.trim());
+
 describe(`DSL`, () => {
   describe(`escaping`, () => {
     it(`should escape string constants using C-style escapes`, () => {
@@ -185,51 +188,53 @@ describe(`DSL`, () => {
       });
     });
 
-    test(
-      `select "User"."name" from "User" where ("User"."email" = $1` +
-        ` and ("User"."createdTime" > (current_timestamp - cast($2 as interval))` +
-        ` or "User"."modifiedTime" < (current_timestamp - cast($3 as interval))))` +
-        ` or "User"."inactive" = $4`,
-      () => {
-        const User = jsql.table('User', [
-          jsql.column('name', { type: String }),
-          jsql.column('email', { type: String }),
-          jsql.column('createdTime', { type: Timestamp }),
-          jsql.column('modifiedTime', { type: Timestamp }),
-          jsql.column('inactive', { type: Boolean })
-        ]);
+    test(`select "User"."name" from "User"
+        where (
+          ("User"."email" = $1) and (
+            ("User"."createdTime" > (current_timestamp - cast($2 as interval))) or
+            ("User"."modifiedTime" < (current_timestamp - cast($3 as interval)))
+          )
+        ) or ("User"."inactive" = $4)`, () => {
+      const User = jsql.table('User', [
+        jsql.column('name', { type: String }),
+        jsql.column('email', { type: String }),
+        jsql.column('createdTime', { type: Timestamp }),
+        jsql.column('modifiedTime', { type: Timestamp }),
+        jsql.column('inactive', { type: Boolean })
+      ]);
 
-        const yesterday = jsql.subtraction(
-          Timestamp.now(),
-          Timestamp.interval('1 day')
-        );
+      const yesterday = jsql.subtraction(
+        Timestamp.now(),
+        Timestamp.interval('1 day')
+      );
 
-        expect(
-          jsql
-            .select([User.name], {
-              from: [User],
-              where: jsql.or(
-                jsql.and(
-                  jsql.equalTo(User.email, 'name@example.com'),
-                  jsql.or(
-                    jsql.greaterThan(User.createdTime, yesterday),
-                    jsql.lessThan(User.modifiedTime, yesterday)
-                  )
-                ),
-                jsql.equalTo(User.inactive, true)
-              )
-            })
-            .toQueryObject()
-        ).toEqual({
-          text:
-            `select "User"."name" from "User" where ("User"."email" = $1` +
-            ` and ("User"."createdTime" > (current_timestamp - cast($2 as interval))` +
-            ` or "User"."modifiedTime" < (current_timestamp - cast($3 as interval))))` +
-            ` or "User"."inactive" = $4`,
-          values: ['name@example.com', '1 day', '1 day', true]
-        });
-      }
-    );
+      expect(
+        jsql
+          .select([User.name], {
+            from: [User],
+            where: jsql.or(
+              jsql.and(
+                jsql.equalTo(User.email, 'name@example.com'),
+                jsql.or(
+                  jsql.greaterThan(User.createdTime, yesterday),
+                  jsql.lessThan(User.modifiedTime, yesterday)
+                )
+              ),
+              jsql.equalTo(User.inactive, true)
+            )
+          })
+          .toQueryObject()
+      ).toEqual({
+        text: removeSpaces(`select "User"."name" from "User"
+          where (
+            ("User"."email" = $1) and (
+              ("User"."createdTime" > (current_timestamp - cast($2 as interval))) or
+              ("User"."modifiedTime" < (current_timestamp - cast($3 as interval)))
+            )
+          ) or ("User"."inactive" = $4)`),
+        values: ['name@example.com', '1 day', '1 day', true]
+      });
+    });
   });
 
   describe(`insert`, () => {
