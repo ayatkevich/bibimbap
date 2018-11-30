@@ -186,9 +186,9 @@ describe(`DSL`, () => {
     });
 
     test(
-      `select "User"."name" from "User" where "User"."email" = $1` +
-        ` and ("User"."createdTime" > current_timestamp - cast($2 as interval)` +
-        ` or "User"."modifiedTime" < current_timestamp - cast($3 as interval))` +
+      `select "User"."name" from "User" where ("User"."email" = $1` +
+        ` and ("User"."createdTime" > (current_timestamp - cast($2 as interval))` +
+        ` or "User"."modifiedTime" < (current_timestamp - cast($3 as interval))))` +
         ` or "User"."inactive" = $4`,
       () => {
         const User = jsql.table('User', [
@@ -222,9 +222,9 @@ describe(`DSL`, () => {
             .toQueryObject()
         ).toEqual({
           text:
-            `select "User"."name" from "User" where "User"."email" = $1` +
-            ` and ("User"."createdTime" > current_timestamp - cast($2 as interval)` +
-            ` or "User"."modifiedTime" < current_timestamp - cast($3 as interval))` +
+            `select "User"."name" from "User" where ("User"."email" = $1` +
+            ` and ("User"."createdTime" > (current_timestamp - cast($2 as interval))` +
+            ` or "User"."modifiedTime" < (current_timestamp - cast($3 as interval))))` +
             ` or "User"."inactive" = $4`,
           values: ['name@example.com', '1 day', '1 day', true]
         });

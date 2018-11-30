@@ -185,7 +185,8 @@ export type FromKind = Table<any, any>;
 
 export enum BinaryExpressionKind {
   EQUALITY = ' = ',
-  SUBTRACTION = ' - '
+  SUBTRACTION = ' - ',
+  OR = ' or '
 }
 
 export type BinaryExpressionEquality<Left, Right> = {
@@ -200,9 +201,16 @@ export type BinaryExpressionSubtraction<Left, Right> = {
   right: Right;
 };
 
+export type BinaryExpressionOr<Left, Right> = {
+  kind: BinaryExpressionKind.OR;
+  left: Left;
+  right: Right;
+};
+
 export type WhereKind =
   | BinaryExpressionEquality<any, any>
-  | BinaryExpressionSubtraction<any, any>;
+  | BinaryExpressionSubtraction<any, any>
+  | BinaryExpressionOr<any, any>;
 
 export interface Select<
   Params extends SelectKind,
@@ -308,8 +316,14 @@ const isColumnLinked = (
 ): value is ColumnLinked<any, any, any, any, any> =>
   value && value.$ === JSQLType.COLUMN && value.kind === ColumnKind.LINKED;
 
-const traverseExpressionTree = (tree: WhereKind, variableIndex = 1) => {
-  const values: any[] = [];
+const isWhereKind = (value: any): value is WhereKind =>
+  value && value.kind && value.left && value.right;
+
+const traverseExpressionTree = (
+  tree: WhereKind,
+  variableIndex = 1
+): { clause: string; values: any[]; variableIndex: number } => {
+  let values: any[] = [];
   return {
     clause: [tree.left, tree.right]
       .map(branch => {
@@ -325,12 +339,18 @@ const traverseExpressionTree = (tree: WhereKind, variableIndex = 1) => {
               values.push(branch.value);
               return `cast($${variableIndex++} as interval)`;
           }
+        } else if (isWhereKind(branch)) {
+          const result = traverseExpressionTree(branch, variableIndex);
+          values = values.concat(result.values);
+          variableIndex = result.variableIndex;
+          return `(${result.clause})`;
         }
         values.push(branch);
         return `$${variableIndex++}`;
       })
       .join(tree.kind),
-    values
+    values,
+    variableIndex
   };
 };
 
@@ -560,6 +580,15 @@ jsql.subtraction = <X>(
   right: X
 ): BinaryExpressionSubtraction<X, X> => ({
   kind: BinaryExpressionKind.SUBTRACTION,
+  left,
+  right
+});
+
+jsql.or = <Left, Right>(
+  left: Left,
+  right: Right
+): BinaryExpressionOr<Left, Right> => ({
+  kind: BinaryExpressionKind.OR,
   left,
   right
 });
