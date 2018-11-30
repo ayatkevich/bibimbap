@@ -20,7 +20,7 @@ PostgreMote:
     ☐ implement jsql.lessThanOrEqualTo binary expression function
     ☐ implement jsql.notEqual binary expression function
     ☐ implement jsql.addition binary expression function
-    ☐ implement jsql.subtraction binary expression function
+    ✔ implement jsql.subtraction binary expression function @done
     ☐ implement jsql.multiplication binary expression function
     ☐ implement jsql.division binary expression function
     ☐ implement jsql.modulo binary expression function

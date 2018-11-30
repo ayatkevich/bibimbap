@@ -184,7 +184,8 @@ export type SelectKind =
 export type FromKind = Table<any, any>;
 
 export enum BinaryExpressionKind {
-  EQUALITY = ' = '
+  EQUALITY = ' = ',
+  SUBTRACTION = ' - '
 }
 
 export type BinaryExpressionEquality<Left, Right> = {
@@ -193,7 +194,15 @@ export type BinaryExpressionEquality<Left, Right> = {
   right: Right;
 };
 
-export type WhereKind = BinaryExpressionEquality<any, any>;
+export type BinaryExpressionSubtraction<Left, Right> = {
+  kind: BinaryExpressionKind.SUBTRACTION;
+  left: Left;
+  right: Right;
+};
+
+export type WhereKind =
+  | BinaryExpressionEquality<any, any>
+  | BinaryExpressionSubtraction<any, any>;
 
 export interface Select<
   Params extends SelectKind,
@@ -544,6 +553,15 @@ jsql.equalTo = <Column extends ColumnLinked<any, any, any, any, any>>(
   kind: BinaryExpressionKind.EQUALITY,
   left: column,
   right: value
+});
+
+jsql.subtraction = <X>(
+  left: X,
+  right: X
+): BinaryExpressionSubtraction<X, X> => ({
+  kind: BinaryExpressionKind.SUBTRACTION,
+  left,
+  right
 });
 
 jsql.select = <
