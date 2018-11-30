@@ -186,7 +186,8 @@ export type FromKind = Table<any, any>;
 export enum BinaryExpressionKind {
   EQUALITY = ' = ',
   SUBTRACTION = ' - ',
-  OR = ' or '
+  OR = ' or ',
+  AND = ' and '
 }
 
 export type BinaryExpressionEquality<Left, Right> = {
@@ -203,6 +204,12 @@ export type BinaryExpressionSubtraction<Left, Right> = {
 
 export type BinaryExpressionOr<Left, Right> = {
   kind: BinaryExpressionKind.OR;
+  left: Left;
+  right: Right;
+};
+
+export type BinaryExpressionAnd<Left, Right> = {
+  kind: BinaryExpressionKind.AND;
   left: Left;
   right: Right;
 };
@@ -589,6 +596,15 @@ jsql.or = <Left, Right>(
   right: Right
 ): BinaryExpressionOr<Left, Right> => ({
   kind: BinaryExpressionKind.OR,
+  left,
+  right
+});
+
+jsql.and = <Left, Right>(
+  left: Left,
+  right: Right
+): BinaryExpressionAnd<Left, Right> => ({
+  kind: BinaryExpressionKind.AND,
   left,
   right
 });

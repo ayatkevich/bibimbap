@@ -11,7 +11,7 @@ PostgreMote:
     ✔ implement Timestamp type @done
     ✔ implement Timestamp.now static method @done
     ✔ implement Timestamp.interval static method @done
-    ☐ implement jsql.and binary expression function
+    ✔ implement jsql.and binary expression function @done
     ✔ implement jsql.or binary expression function @done
     ☐ implement jsql.not expression function
     ☐ implement jsql.greaterThan binary expression function
