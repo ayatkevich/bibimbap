@@ -183,17 +183,17 @@ export type SelectKind =
 
 export type FromKind = Table<any, any>;
 
-export enum LogicExpressionKind {
+export enum BinaryExpressionKind {
   EQUALITY = ' = '
 }
 
-export type LogicExpressionEquality<Left, Right> = {
-  kind: LogicExpressionKind.EQUALITY;
+export type BinaryExpressionEquality<Left, Right> = {
+  kind: BinaryExpressionKind.EQUALITY;
   left: Left;
   right: Right;
 };
 
-export type WhereKind = LogicExpressionEquality<any, any>;
+export type WhereKind = BinaryExpressionEquality<any, any>;
 
 export interface Select<
   Params extends SelectKind,
@@ -299,7 +299,7 @@ const isColumnLinked = (
 ): value is ColumnLinked<any, any, any, any, any> =>
   value && value.$ === JSQLType.COLUMN && value.kind === ColumnKind.LINKED;
 
-const traverseLogicTree = (tree: WhereKind, variableIndex = 1) => {
+const traverseExpressionTree = (tree: WhereKind, variableIndex = 1) => {
   const values: any[] = [];
   return {
     clause: [tree.left, tree.right]
@@ -352,7 +352,7 @@ const jsqlCompileSelect = (query: Select<SelectKind, FromKind, WhereKind>) => {
   let values: any[] = [];
   let whereExpression = '';
   if (query.where) {
-    const result = traverseLogicTree(query.where);
+    const result = traverseExpressionTree(query.where);
     values = result.values;
     whereExpression = ` where ${result.clause}`;
   }
@@ -532,8 +532,8 @@ jsql.function = <
 jsql.equalTo = <Column extends ColumnLinked<any, any, any, any, any>>(
   column: Column,
   value: NullableColumnType<Column>
-): LogicExpressionEquality<Column, NullableColumnType<Column>> => ({
-  kind: LogicExpressionKind.EQUALITY,
+): BinaryExpressionEquality<Column, NullableColumnType<Column>> => ({
+  kind: BinaryExpressionKind.EQUALITY,
   left: column,
   right: value
 });
