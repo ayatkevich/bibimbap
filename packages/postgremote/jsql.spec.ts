@@ -156,7 +156,7 @@ describe(`DSL`, () => {
 
       expect(
         jsql
-          .select([User.username.as('firstName'), User.lastName], {
+          .select([jsql.as(User.username, 'firstName'), User.lastName], {
             from: [User]
           })
           .toQueryObject()

@@ -33,7 +33,9 @@ import { jsql } from 'postgremote/jsql';
   }
 
   for (const row of await exec(
-    jsql.select([MyTable1['*'], MyTable1.c1.as('c3')], { from: [MyTable1] })
+    jsql.select([MyTable1['*'], jsql.as(MyTable1.c1, 'c3')], {
+      from: [MyTable1]
+    })
   )) {
     row.c1;
     row.c2;
@@ -44,7 +46,7 @@ import { jsql } from 'postgremote/jsql';
   }
 
   for (const row of await exec(
-    jsql.select([MyTable1['*'], MyTable2['*']], {from: [MyTable1, MyTable2]})
+    jsql.select([MyTable1['*'], MyTable2['*']], { from: [MyTable1, MyTable2] })
   )) {
     row.c1;
     row.c2;

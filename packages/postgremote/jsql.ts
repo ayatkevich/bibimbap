@@ -456,20 +456,34 @@ jsql.table = <
       columnName: column.columnName,
       columnSettings: column.columnSettings
     };
-    result[column.columnName] = {
-      ...columnLinked,
-
-      as(aliasName) {
-        return {
-          ...columnLinked,
-          aliasName
-        };
-      }
-    };
+    Object.defineProperty(result, column.columnName, {
+      value: columnLinked,
+      writable: false,
+      enumerable: true,
+      configurable: false
+    });
   }
 
   return result;
 };
+
+jsql.as = <
+  Column extends ColumnLinked<any, any, any, any, any, any>,
+  Alias extends string
+>(
+  columnLinked: Column,
+  aliasName: Alias
+): ColumnLinked<
+  Column['tableName'],
+  Column['columnName'],
+  Column['columnSettings']['type'],
+  Column['columnSettings']['defaultable'],
+  Column['columnSettings']['nullable'],
+  Alias
+> => ({
+  ...columnLinked,
+  aliasName
+});
 
 jsql.column = <
   ColumnName extends string,
