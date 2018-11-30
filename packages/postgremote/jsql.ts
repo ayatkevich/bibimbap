@@ -308,6 +308,14 @@ const traverseExpressionTree = (tree: WhereKind, variableIndex = 1) => {
           return escapeId(
             `${branch.tableName}.${branch.aliasName || branch.columnName}`
           );
+        } else if (branch instanceof Timestamp) {
+          switch (branch.kind) {
+            case TimestampKind.CURRENT_TIMESTAMP:
+              return 'current_timestamp';
+            case TimestampKind.INTERVAL:
+              values.push(branch.value);
+              return `cast($${variableIndex++} as interval)`;
+          }
         }
         values.push(branch);
         return `$${variableIndex++}`;
@@ -586,3 +594,32 @@ jsql.insert = <Into extends Table<any, any>>(
       };
     }
   }();
+
+enum TimestampKind {
+  TIMESTAMP,
+  CURRENT_TIMESTAMP,
+  INTERVAL
+}
+
+export class Timestamp {
+  value: string;
+  kind: TimestampKind = TimestampKind.TIMESTAMP;
+
+  constructor(value: string = '', isInterval = false) {
+    this.value = value;
+
+    if (!value) {
+      this.kind = TimestampKind.CURRENT_TIMESTAMP;
+    } else if (isInterval) {
+      this.kind = TimestampKind.INTERVAL;
+    }
+  }
+
+  static now() {
+    return new Timestamp();
+  }
+
+  static interval(duration: string) {
+    return new Timestamp(duration, true);
+  }
+}

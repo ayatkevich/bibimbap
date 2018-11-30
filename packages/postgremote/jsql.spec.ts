@@ -1,4 +1,11 @@
-import { escape, escapeId, jsql, JSQLError, QueryKind } from './jsql';
+import {
+  escape,
+  escapeId,
+  jsql,
+  JSQLError,
+  QueryKind,
+  Timestamp
+} from './jsql';
 
 describe(`DSL`, () => {
   describe(`escaping`, () => {
@@ -187,14 +194,14 @@ describe(`DSL`, () => {
         const User = jsql.table('User', [
           jsql.column('name', { type: String }),
           jsql.column('email', { type: String }),
-          jsql.column('createdTime', { type: jsql.Timestamp }),
-          jsql.column('modifiedTime', { type: jsql.Timestamp }),
+          jsql.column('createdTime', { type: Timestamp }),
+          jsql.column('modifiedTime', { type: Timestamp }),
           jsql.column('inactive', { type: Boolean })
         ]);
 
         const yesterday = jsql.subtraction(
-          jsql.Timestamp.now(),
-          jsql.Timestamp.interval('1 day')
+          Timestamp.now(),
+          Timestamp.interval('1 day')
         );
 
         expect(

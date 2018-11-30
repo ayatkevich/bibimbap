@@ -8,9 +8,9 @@ PostgreMote:
   ☐ implement an SQL-like DSL
     ✔ change all operands to lower case to follow the sql formatting style @done
     ✔ rename jsql.equals binary expression function to jsql.equalTo @done
-    ☐ implement Timestamp type
-    ☐ implement Timestamp.now static method
-    ☐ implement Timestamp.interval static method
+    ✔ implement Timestamp type @done
+    ✔ implement Timestamp.now static method @done
+    ✔ implement Timestamp.interval static method @done
     ☐ implement jsql.and binary expression function
     ☐ implement jsql.or binary expression function
     ☐ implement jsql.not expression function
