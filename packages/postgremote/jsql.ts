@@ -513,7 +513,7 @@ jsql.function = <
   return executor;
 };
 
-jsql.equals = <Column extends ColumnLinked<any, any, any, any, any>>(
+jsql.equalTo = <Column extends ColumnLinked<any, any, any, any, any>>(
   column: Column,
   value: NullableColumnType<Column>
 ): LogicExpressionEquality<Column, NullableColumnType<Column>> => ({

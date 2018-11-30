@@ -80,13 +80,13 @@ const ComponentRow = jsql.subQuery(
       from: [
         Data.Component,
         jsql.leftOuterJoin(Data.ComponentManufacturer, {
-          on: jsql.equals(
+          on: jsql.equalTo(
             Data.ComponentManufacturer.componentId,
             Data.Component.id
           )
         }),
         jsql.leftOuterJoin(Data.Manufacturer, {
-          on: jsql.equals(
+          on: jsql.equalTo(
             Data.ComponentManufacturer.manufacturerId,
             Data.Manufacturer.id
           )
@@ -103,14 +103,14 @@ const selectDeviceDetails = (deviceId: ColumnType<typeof Data.Device.id>) =>
     from: [
       Data.Device,
       jsql.leftOuterJoin(Data.DeviceComponent, {
-        on: jsql.equals(Data.DeviceComponent.deviceId, Data.Device.id)
+        on: jsql.equalTo(Data.DeviceComponent.deviceId, Data.Device.id)
       }),
       jsql.leftOuterJoin(ComponentRow, {
-        on: jsql.equals(ComponentRow.id, Data.DeviceComponent.componentId)
+        on: jsql.equalTo(ComponentRow.id, Data.DeviceComponent.componentId)
       })
     ],
     groupBy: [Data.Device.id],
-    where: jsql.equals(Data.Device.id, deviceId),
+    where: jsql.equalTo(Data.Device.id, deviceId),
     limit: [1]
   });
 ```

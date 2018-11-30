@@ -7,7 +7,7 @@ Chores:
 PostgreMote:
   ☐ implement an SQL-like DSL
     ✔ change all operands to lower case to follow the sql formatting style @done
-    ☐ rename jsql.equals binary expression function to jsql.equalTo
+    ✔ rename jsql.equals binary expression function to jsql.equalTo @done
     ☐ implement Timestamp type
     ☐ implement Timestamp.now static method
     ☐ implement Timestamp.interval static method

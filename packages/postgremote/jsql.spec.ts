@@ -203,13 +203,13 @@ describe(`DSL`, () => {
               from: [User],
               where: jsql.or(
                 jsql.and(
-                  jsql.equals(User.email, 'name@example.com'),
+                  jsql.equalTo(User.email, 'name@example.com'),
                   jsql.or(
                     jsql.greaterThan(User.createdTime, yesterday),
                     jsql.lessThan(User.modifiedTime, yesterday)
                   )
                 ),
-                jsql.equals(User.inactive, true)
+                jsql.equalTo(User.inactive, true)
               )
             })
             .toQueryObject()
