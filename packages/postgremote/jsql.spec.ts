@@ -178,22 +178,51 @@ describe(`DSL`, () => {
       });
     });
 
-    test(`select "User"."name" from "User" where "User"."email" = $1`, () => {
-      const User = jsql.table('User', [
-        jsql.column('name', { type: String }),
-        jsql.column('email', { type: String })
-      ]);
+    test(
+      `select "User"."name" from "User" where "User"."email" = $1` +
+        ` and ("User"."createdTime" > current_timestamp - cast($2 as interval)` +
+        ` or "User"."modifiedTime" < current_timestamp - cast($3 as interval))` +
+        ` or "User"."inactive" = $4`,
+      () => {
+        const User = jsql.table('User', [
+          jsql.column('name', { type: String }),
+          jsql.column('email', { type: String }),
+          jsql.column('createdTime', { type: jsql.Timestamp }),
+          jsql.column('modifiedTime', { type: jsql.Timestamp }),
+          jsql.column('inactive', { type: Boolean })
+        ]);
 
-      expect(
-        jsql.select([User.name], {
-          from: [User],
-          where: jsql.equals(User.email, 'name@example.com')
-        }).toQueryObject()
-      ).toEqual({
-        text: `select "User"."name" from "User" where "User"."email" = $1`,
-        values: ['name@example.com']
-      });
-    });
+        const yesterday = jsql.subtraction(
+          jsql.Timestamp.now(),
+          jsql.Timestamp.interval('1 day')
+        );
+
+        expect(
+          jsql
+            .select([User.name], {
+              from: [User],
+              where: jsql.or(
+                jsql.and(
+                  jsql.equals(User.email, 'name@example.com'),
+                  jsql.or(
+                    jsql.greaterThan(User.createdTime, yesterday),
+                    jsql.lessThan(User.modifiedTime, yesterday)
+                  )
+                ),
+                jsql.equals(User.inactive, true)
+              )
+            })
+            .toQueryObject()
+        ).toEqual({
+          text:
+            `select "User"."name" from "User" where "User"."email" = $1` +
+            ` and ("User"."createdTime" > current_timestamp - cast($2 as interval)` +
+            ` or "User"."modifiedTime" < current_timestamp - cast($3 as interval))` +
+            ` or "User"."inactive" = $4`,
+          values: ['name@example.com', '1 day', '1 day', true]
+        });
+      }
+    );
   });
 
   describe(`insert`, () => {
