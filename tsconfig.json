@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "baseUrl": "./src",
+    "baseUrl": "./packages",
     "declaration": false,
     "noEmit": true,
     "downlevelIteration": true,
