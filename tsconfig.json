@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "importHelpers": false,
     "inlineSourceMap": true,
-    "lib": ["es2015", "es2016.array.include"],
+    "lib": ["es2015", "es2016.array.include", "es2017"],
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,

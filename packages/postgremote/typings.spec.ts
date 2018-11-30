@@ -17,7 +17,11 @@ test('check typings', () => {
       experimentalDecorators: true,
       importHelpers: false,
       inlineSourceMap: true,
-      lib: ['lib.es2015.d.ts', 'lib.es2016.array.include.d.ts'],
+      lib: [
+        'lib.es2015.d.ts',
+        'lib.es2016.array.include.d.ts',
+        'lib.es2017.d.ts'
+      ],
       module: ts.ModuleKind.CommonJS,
       moduleResolution: ts.ModuleResolutionKind.NodeJs,
       noEmitOnError: true,

@@ -375,7 +375,7 @@ const jsqlCompileInsert = <Into extends Table<any, any>>(
         column => column.columnName
       );
 
-      for (const key of Object.getOwnPropertyNames(query.values)) {
+      for (const [key, value] of Object.entries(query.values)) {
         if (!columnNames.includes(key)) {
           throw new JSQLError(
             `Table ${query.into.$$} does not have column with name ${key}`
@@ -383,7 +383,7 @@ const jsqlCompileInsert = <Into extends Table<any, any>>(
         }
         columns.push(escapeId(key));
         placeholders.push(`$${++placeholderNumber}`);
-        values.push(query.values[key]);
+        values.push(value);
       }
 
       return {
