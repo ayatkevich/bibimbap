@@ -58,7 +58,7 @@ type UnpackedColumns<Query extends JSQLQuery>
     ? AstersikColumns<Params, From> : never;
 
 type QueryResultType<Columns> = {
-  [Key in ColumnName<Columns>]: ReturnType<
+  [Key in ColumnName<Columns>]: InstanceType<
     NamedColumn<Key, Columns>['columnSettings']['type']
   >
 };

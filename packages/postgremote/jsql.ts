@@ -53,7 +53,7 @@ type ColumnType<
   Column extends
     | ColumnFree<any, any, any, any>
     | ColumnLinked<any, any, any, any, any>
-> = ReturnType<Column['columnSettings']['type']>;
+> = InstanceType<Column['columnSettings']['type']>;
 
 type NullableColumnType<
   Column extends
