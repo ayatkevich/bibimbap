@@ -37,15 +37,15 @@ describe(`DSL`, () => {
   });
 
   describe(`functions`, () => {
-    test(`SELECT "login"()`, () => {
+    test(`select "login"()`, () => {
       const login = jsql.function('login', [], Boolean);
       expect(login({}).toQueryObject()).toEqual({
-        text: `SELECT "login"()`,
+        text: `select "login"()`,
         values: []
       });
     });
 
-    test(`SELECT "login"($1, $2)`, () => {
+    test(`select "login"($1, $2)`, () => {
       const login = jsql.function(
         'login',
         [
@@ -58,19 +58,19 @@ describe(`DSL`, () => {
       expect(
         login({ username: 'username', password: 'password' }).toQueryObject()
       ).toEqual({
-        text: `SELECT "login"($1, $2)`,
+        text: `select "login"($1, $2)`,
         values: ['username', 'password']
       });
 
       expect(
         login({ password: 'password', username: 'username' }).toQueryObject()
       ).toEqual({
-        text: `SELECT "login"($1, $2)`,
+        text: `select "login"($1, $2)`,
         values: ['username', 'password']
       });
 
       expect(login({ username: 'username' }).toQueryObject()).toEqual({
-        text: `SELECT "login"($1, $2)`,
+        text: `select "login"($1, $2)`,
         values: ['username', null]
       });
     });
@@ -116,17 +116,17 @@ describe(`DSL`, () => {
       }).toThrowError(JSQLError);
     });
 
-    test(`SELECT "TableName".* FROM "TableName"`, () => {
+    test(`select "TableName".* from "TableName"`, () => {
       const TableName = jsql.table('TableName', [
         jsql.column('column', { type: String })
       ]);
 
       expect(
         jsql.select([TableName['*']], { from: [TableName] }).toQueryObject()
-      ).toEqual({ text: `SELECT "TableName".* FROM "TableName"`, values: [] });
+      ).toEqual({ text: `select "TableName".* from "TableName"`, values: [] });
     });
 
-    test(`SELECT "User"."firstName", "User"."lastName" FROM "User"`, () => {
+    test(`select "User"."firstName", "User"."lastName" from "User"`, () => {
       const User = jsql.table('User', [
         jsql.column('firstName', {
           type: String,
@@ -143,12 +143,12 @@ describe(`DSL`, () => {
           .select([User.firstName, User.lastName], { from: [User] })
           .toQueryObject()
       ).toEqual({
-        text: `SELECT "User"."firstName", "User"."lastName" FROM "User"`,
+        text: `select "User"."firstName", "User"."lastName" from "User"`,
         values: []
       });
     });
 
-    test(`SELECT "User"."username" as "firstName", "User"."lastName" FROM "User"`, () => {
+    test(`select "User"."username" as "firstName", "User"."lastName" from "User"`, () => {
       const User = jsql.table('User', [
         jsql.column('username', { type: String }),
         jsql.column('lastName', { type: String })
@@ -161,24 +161,24 @@ describe(`DSL`, () => {
           })
           .toQueryObject()
       ).toEqual({
-        text: `SELECT "User"."username" as "firstName", "User"."lastName" FROM "User"`,
+        text: `select "User"."username" as "firstName", "User"."lastName" from "User"`,
         values: []
       });
     });
 
-    test(`SELECT "T1"."a", "T2"."b" FROM "T1", "T2"`, () => {
+    test(`select "T1"."a", "T2"."b" from "T1", "T2"`, () => {
       const T1 = jsql.table('T1', [jsql.column('a', { type: String })]);
       const T2 = jsql.table('T2', [jsql.column('b', { type: String })]);
 
       expect(
         jsql.select([T1.a, T2.b], { from: [T1, T2] }).toQueryObject()
       ).toEqual({
-        text: `SELECT "T1"."a", "T2"."b" FROM "T1", "T2"`,
+        text: `select "T1"."a", "T2"."b" from "T1", "T2"`,
         values: []
       });
     });
 
-    test(`SELECT "User"."name" FROM "User" WHERE "User"."email" = $1`, () => {
+    test(`select "User"."name" from "User" where "User"."email" = $1`, () => {
       const User = jsql.table('User', [
         jsql.column('name', { type: String }),
         jsql.column('email', { type: String })
@@ -190,14 +190,14 @@ describe(`DSL`, () => {
           where: jsql.equals(User.email, 'name@example.com')
         }).toQueryObject()
       ).toEqual({
-        text: `SELECT "User"."name" FROM "User" WHERE "User"."email" = $1`,
+        text: `select "User"."name" from "User" where "User"."email" = $1`,
         values: ['name@example.com']
       });
     });
   });
 
   describe(`insert`, () => {
-    test(`INSERT INTO "User" ("firstName", "lastName") VALUES ($1, $2)`, () => {
+    test(`insert into "User" ("firstName", "lastName") values ($1, $2)`, () => {
       const User = jsql.table('User', [
         jsql.column('firstName', { type: String }),
         jsql.column('lastName', { type: String })
@@ -211,7 +211,7 @@ describe(`DSL`, () => {
           })
           .toQueryObject()
       ).toEqual({
-        text: `INSERT INTO "User" ("firstName", "lastName") VALUES ($1, $2)`,
+        text: `insert into "User" ("firstName", "lastName") values ($1, $2)`,
         values: ['Alexander', 'Yatkevich']
       });
     });

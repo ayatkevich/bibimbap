@@ -352,11 +352,11 @@ const jsqlCompileSelect = (query: Select<SelectKind, FromKind, WhereKind>) => {
   if (query.where) {
     const result = traverseLogicTree(query.where);
     values = result.values;
-    whereExpression = ` WHERE ${result.clause}`;
+    whereExpression = ` where ${result.clause}`;
   }
 
   return {
-    text: `SELECT ${selectExpression} FROM ${fromExpression}${whereExpression}`,
+    text: `select ${selectExpression} from ${fromExpression}${whereExpression}`,
     values
   };
 };
@@ -387,9 +387,9 @@ const jsqlCompileInsert = <Into extends Table<any, any>>(
       }
 
       return {
-        text: `INSERT INTO ${escapeId(query.into.$$)} (${columns.join(
+        text: `insert into ${escapeId(query.into.$$)} (${columns.join(
           ', '
-        )}) VALUES (${placeholders.join(', ')})`,
+        )}) values (${placeholders.join(', ')})`,
         values
       };
   }
@@ -399,7 +399,7 @@ const jsqlCompileExecute = (query: Execute) => {
   switch (query.executeKind) {
     case ExecuteKind.FUNCTION:
       return {
-        text: `SELECT ${escapeId(query.functionName)}(${query.functionArgs
+        text: `select ${escapeId(query.functionName)}(${query.functionArgs
           .map((_, i) => `$${i + 1}`)
           .join(', ')})`,
         values: query.functionArgs.map(functionArg =>

@@ -6,10 +6,11 @@ Chores:
 
 PostgreMote:
   ☐ implement an SQL-like DSL
-    ☐ change all operands to lower case to follow the sql formatting style
+    ✔ change all operands to lower case to follow the sql formatting style @done
     ☐ implement complete logic expression traversing
     ☐ implement procedure
     ☐ add joins
+    ☐ add subqueries
     ☐ improve jsql with runtime guards
     ☐ get rid of sqlstring dependency
   ☐ implement a request method that infer select types and wrap it with Promise
