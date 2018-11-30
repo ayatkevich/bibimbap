@@ -14,8 +14,8 @@ PostgreMote:
     ✔ implement jsql.and binary expression function @done
     ✔ implement jsql.or binary expression function @done
     ☐ implement jsql.not expression function
-    ☐ implement jsql.greaterThan binary expression function
-    ☐ implement jsql.lessThan binary expression function
+    ✔ implement jsql.greaterThan binary expression function @done
+    ✔ implement jsql.lessThan binary expression function @done
     ☐ implement jsql.greatThanOrEqualTo binary expression function
     ☐ implement jsql.lessThanOrEqualTo binary expression function
     ☐ implement jsql.notEqual binary expression function

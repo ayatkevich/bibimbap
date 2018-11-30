@@ -184,20 +184,16 @@ export type SelectKind =
 export type FromKind = Table<any, any>;
 
 export enum BinaryExpressionKind {
-  EQUALITY = ' = ',
-  SUBTRACTION = ' - ',
+  AND = ' and ',
   OR = ' or ',
-  AND = ' and '
+  EQUALITY = ' = ',
+  GREATER_THAN = ' > ',
+  LESS_THAN = ' < ',
+  SUBTRACTION = ' - '
 }
 
-export type BinaryExpressionEquality<Left, Right> = {
-  kind: BinaryExpressionKind.EQUALITY;
-  left: Left;
-  right: Right;
-};
-
-export type BinaryExpressionSubtraction<Left, Right> = {
-  kind: BinaryExpressionKind.SUBTRACTION;
+export type BinaryExpressionAnd<Left, Right> = {
+  kind: BinaryExpressionKind.AND;
   left: Left;
   right: Right;
 };
@@ -208,8 +204,26 @@ export type BinaryExpressionOr<Left, Right> = {
   right: Right;
 };
 
-export type BinaryExpressionAnd<Left, Right> = {
-  kind: BinaryExpressionKind.AND;
+export type BinaryExpressionEquality<Left, Right> = {
+  kind: BinaryExpressionKind.EQUALITY;
+  left: Left;
+  right: Right;
+};
+
+export type BinaryExpressionGreaterThan<Left, Right> = {
+  kind: BinaryExpressionKind.GREATER_THAN;
+  left: Left;
+  right: Right;
+};
+
+export type BinaryExpressionLessThan<Left, Right> = {
+  kind: BinaryExpressionKind.LESS_THAN;
+  left: Left;
+  right: Right;
+};
+
+export type BinaryExpressionSubtraction<Left, Right> = {
+  kind: BinaryExpressionKind.SUBTRACTION;
   left: Left;
   right: Right;
 };
@@ -573,20 +587,11 @@ jsql.function = <
   return executor;
 };
 
-jsql.equalTo = <Column extends ColumnLinked<any, any, any, any, any>>(
-  column: Column,
-  value: NullableColumnType<Column>
-): BinaryExpressionEquality<Column, NullableColumnType<Column>> => ({
-  kind: BinaryExpressionKind.EQUALITY,
-  left: column,
-  right: value
-});
-
-jsql.subtraction = <X>(
-  left: X,
-  right: X
-): BinaryExpressionSubtraction<X, X> => ({
-  kind: BinaryExpressionKind.SUBTRACTION,
+jsql.and = <Left, Right>(
+  left: Left,
+  right: Right
+): BinaryExpressionAnd<Left, Right> => ({
+  kind: BinaryExpressionKind.AND,
   left,
   right
 });
@@ -600,11 +605,62 @@ jsql.or = <Left, Right>(
   right
 });
 
-jsql.and = <Left, Right>(
-  left: Left,
-  right: Right
-): BinaryExpressionAnd<Left, Right> => ({
-  kind: BinaryExpressionKind.AND,
+jsql.equalTo = <Column extends ColumnLinked<any, any, any, any, any>>(
+  column: Column,
+  value: NullableColumnType<Column>
+): BinaryExpressionEquality<Column, NullableColumnType<Column>> => ({
+  kind: BinaryExpressionKind.EQUALITY,
+  left: column,
+  right: value
+});
+
+jsql.greaterThan = <Column extends ColumnLinked<any, any, any, any, any>>(
+  column: Column,
+  value:
+    | NullableColumnType<Column>
+    | BinaryExpressionSubtraction<
+        NullableColumnType<Column>,
+        NullableColumnType<Column>
+      >
+): BinaryExpressionGreaterThan<
+  Column,
+  | NullableColumnType<Column>
+  | BinaryExpressionSubtraction<
+      NullableColumnType<Column>,
+      NullableColumnType<Column>
+    >
+> => ({
+  kind: BinaryExpressionKind.GREATER_THAN,
+  left: column,
+  right: value
+});
+
+jsql.lessThan = <Column extends ColumnLinked<any, any, any, any, any>>(
+  column: Column,
+  value:
+    | NullableColumnType<Column>
+    | BinaryExpressionSubtraction<
+        NullableColumnType<Column>,
+        NullableColumnType<Column>
+      >
+): BinaryExpressionLessThan<
+  Column,
+  | NullableColumnType<Column>
+  | BinaryExpressionSubtraction<
+      NullableColumnType<Column>,
+      NullableColumnType<Column>
+    >
+> => ({
+  kind: BinaryExpressionKind.LESS_THAN,
+  left: column,
+  right: value
+});
+
+jsql.subtraction = <X>(
+  left: X,
+  right: X
+): BinaryExpressionSubtraction<X, X> => ({
+  kind: BinaryExpressionKind.SUBTRACTION,
   left,
   right
 });
