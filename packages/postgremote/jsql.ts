@@ -6,8 +6,10 @@ enum JSQLType {
   FUNCTION
 }
 
+type TypeClass = { new (): {} };
+
 type ColumnSettings<
-  DataType extends (...args: any[]) => any,
+  DataType extends TypeClass,
   DataDefaultable extends boolean | undefined,
   DataNullable extends boolean | undefined
 > = {
@@ -23,7 +25,7 @@ enum ColumnKind {
 }
 export type ColumnFree<
   ColumnName extends string,
-  DataType extends (...args: any[]) => any,
+  DataType extends TypeClass,
   DataDefaultable extends boolean | undefined,
   DataNullable extends boolean | undefined
 > = {
@@ -36,7 +38,7 @@ export type ColumnFree<
 export type ColumnLinked<
   TableName extends string,
   ColumnName extends string,
-  DataType extends (...args: any[]) => any,
+  DataType extends TypeClass,
   DataDefaultable extends boolean | undefined,
   DataNullable extends boolean | undefined,
   AliasName extends string = ''
@@ -108,7 +110,7 @@ export type Table<
 type StoredFunction<
   FunctionName extends string,
   Args extends ColumnFree<any, any, any, any>,
-  Returns extends (...args: any[]) => any
+  Returns extends TypeClass
 > = {
   (args: PropertiesFromColumns<Args>): QueryGenerator<Execute>;
   functionName: FunctionName;
@@ -487,7 +489,7 @@ jsql.as = <
 
 jsql.column = <
   ColumnName extends string,
-  DataType extends (...args: any[]) => any,
+  DataType extends TypeClass,
   DataDefaultable extends boolean | undefined,
   DataNullable extends boolean | undefined
 >(
@@ -503,7 +505,7 @@ jsql.column = <
 jsql.function = <
   FunctionName extends string,
   Args extends ColumnFree<any, any, any, any>,
-  Returns extends (...args: any[]) => any
+  Returns extends TypeClass
 >(
   functionName: FunctionName,
   functionArgs: Args[],
