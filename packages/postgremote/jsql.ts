@@ -93,18 +93,6 @@ export type Table<
       NamedColumn<ColumnName, Columns>['columnSettings']['defaultable'],
       NamedColumn<ColumnName, Columns>['columnSettings']['nullable']
     >
-    & {
-      as<AliasName extends string>(
-        aliasName: AliasName
-      ): ColumnLinked<
-        TableName,
-        ColumnName,
-        NamedColumn<ColumnName, Columns>['columnSettings']['type'],
-        NamedColumn<ColumnName, Columns>['columnSettings']['defaultable'],
-        NamedColumn<ColumnName, Columns>['columnSettings']['nullable'],
-        AliasName
-      >;
-    }
   };
 
 type StoredFunction<
