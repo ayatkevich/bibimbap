@@ -13,6 +13,7 @@ PostgreMote:
     ✔ implement Timestamp.interval static method @done
     ✔ implement jsql.and binary expression function @done
     ✔ implement jsql.or binary expression function @done
+    ☐ make all binary expression functions being able to take columns and simple types either left or right and both, and provide comprehensive type checking for them
     ☐ implement jsql.not expression function
     ✔ implement jsql.greaterThan binary expression function @done
     ✔ implement jsql.lessThan binary expression function @done
@@ -41,6 +42,7 @@ PostgreMote:
     ☐ get rid of sqlstring dependency
   ☐ implement a request method that infer select types and wrap it with Promise
     ☐ find the way to compile client for client-side without server-side code
+    ☐ propagate request errors
   ☐ implement a tool that generates TypeScript code for PostgreSQL stored functions and tables from the chosen schemas
     ☐ full type inference with postgresql data types
     ☐ generate procedures
