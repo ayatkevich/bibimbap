@@ -13,7 +13,7 @@ PostgreMote:
     ✔ implement Timestamp.interval static method @done
     ✔ implement jsql.and binary expression function @done
     ✔ implement jsql.or binary expression function @done
-    ☐ make all binary expression functions being able to take columns and simple types either left or right and both, and provide comprehensive type checking for them
+    ✔ simplify binary expressions @done
     ☐ implement jsql.not expression function
     ✔ implement jsql.greaterThan binary expression function @done
     ✔ implement jsql.lessThan binary expression function @done

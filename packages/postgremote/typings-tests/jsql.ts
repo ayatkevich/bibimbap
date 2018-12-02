@@ -90,25 +90,8 @@ oneArgRequiredTwoOptional({ arg: '', nullable: 'string instead of number' });
 
 const TableForSelect1 = jsql.table('TableForSelect1', [
   jsql.column('column1', { type: String }),
-  jsql.column('column2', { type: Number, nullable: true })
+  jsql.column('column2', { type: Number, nullable: true }),
+  jsql.column('column3', { type: String, nullable: true })
 ]);
 
 jsql.select([TableForSelect1['*']], { from: [TableForSelect1] });
-
-/**
- * equalTo helper
- */
-
-jsql.equalTo(TableForSelect1.column1, 'string');
-
-// wrong type of right hand arg
-jsql.equalTo(TableForSelect1.column1, 1);
-
-// wrong type of right hand arg
-jsql.equalTo(TableForSelect1.column1, null);
-
-// wrong type of right hand arg
-jsql.equalTo(TableForSelect1.column1, undefined);
-
-jsql.equalTo(TableForSelect1.column2, null);
-jsql.equalTo(TableForSelect1.column2, 2);

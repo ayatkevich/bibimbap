@@ -6,10 +6,8 @@ enum JSQLType {
   FUNCTION
 }
 
-type TypeClass = { new (): {} };
-
 type ColumnSettings<
-  DataType extends TypeClass,
+  DataType,
   DataDefaultable extends boolean | undefined,
   DataNullable extends boolean | undefined
 > = {
@@ -25,7 +23,7 @@ enum ColumnKind {
 }
 export type ColumnFree<
   ColumnName extends string,
-  DataType extends TypeClass,
+  DataType,
   DataDefaultable extends boolean | undefined,
   DataNullable extends boolean | undefined
 > = {
@@ -38,7 +36,7 @@ export type ColumnFree<
 export type ColumnLinked<
   TableName extends string,
   ColumnName extends string,
-  DataType extends TypeClass,
+  DataType,
   DataDefaultable extends boolean | undefined,
   DataNullable extends boolean | undefined,
   AliasName extends string = ''
@@ -51,21 +49,11 @@ export type ColumnLinked<
   columnSettings: ColumnSettings<DataType, DataDefaultable, DataNullable>;
 };
 
-type ColumnType<
-  Column extends
-    | ColumnFree<any, any, any, any>
-    | ColumnLinked<any, any, any, any, any>
-> = InstanceType<Column['columnSettings']['type']>;
+type ColumnLinkedAny = ColumnLinked<any, any, any, any, any>;
 
-type NullableColumnType<
-  Column extends
-    | ColumnFree<any, any, any, any>
-    | ColumnLinked<any, any, any, any, any>
-> = Column extends ColumnFree<any, any, any, true>
-  ? null | ColumnType<Column>
-  : Column extends ColumnLinked<any, any, any, any, true>
-  ? null | ColumnType<Column>
-  : ColumnType<Column>;
+type ColumnType<
+  Column extends ColumnFree<any, any, any, any> | ColumnLinkedAny
+> = InstanceType<Column['columnSettings']['type']>;
 
 export type ColumnAsterisk<TableName extends string> = {
   $: JSQLType.COLUMN;
@@ -98,7 +86,7 @@ export type Table<
 type StoredFunction<
   FunctionName extends string,
   Args extends ColumnFree<any, any, any, any>,
-  Returns extends TypeClass
+  Returns
 > = {
   (args: PropertiesFromColumns<Args>): QueryGenerator<Execute>;
   functionName: FunctionName;
@@ -166,60 +154,27 @@ export enum QueryKind {
 
 export type SelectKind =
   | ColumnAsterisk<any>
-  | ColumnLinked<any, any, any, any, any>
+  | ColumnLinkedAny
   | ColumnLinked<any, any, any, any, any, any>;
 
 export type FromKind = Table<any, any>;
 
-export enum BinaryExpressionKind {
-  AND = ' and ',
-  OR = ' or ',
-  EQUALITY = ' = ',
-  GREATER_THAN = ' > ',
-  LESS_THAN = ' < ',
-  SUBTRACTION = ' - '
-}
+export const BinaryExpressionKind = {
+  AND: ' and ',
+  OR: ' or ',
+  EQUALITY: ' = ',
+  GREATER_THAN: ' > ',
+  LESS_THAN: ' < ',
+  SUBTRACTION: ' - '
+};
 
-export type BinaryExpressionAnd<Left, Right> = {
-  kind: BinaryExpressionKind.AND;
+export type BinaryExpression<Kind, Left, Right> = {
+  kind: Kind;
   left: Left;
   right: Right;
 };
 
-export type BinaryExpressionOr<Left, Right> = {
-  kind: BinaryExpressionKind.OR;
-  left: Left;
-  right: Right;
-};
-
-export type BinaryExpressionEquality<Left, Right> = {
-  kind: BinaryExpressionKind.EQUALITY;
-  left: Left;
-  right: Right;
-};
-
-export type BinaryExpressionGreaterThan<Left, Right> = {
-  kind: BinaryExpressionKind.GREATER_THAN;
-  left: Left;
-  right: Right;
-};
-
-export type BinaryExpressionLessThan<Left, Right> = {
-  kind: BinaryExpressionKind.LESS_THAN;
-  left: Left;
-  right: Right;
-};
-
-export type BinaryExpressionSubtraction<Left, Right> = {
-  kind: BinaryExpressionKind.SUBTRACTION;
-  left: Left;
-  right: Right;
-};
-
-export type WhereKind =
-  | BinaryExpressionEquality<any, any>
-  | BinaryExpressionSubtraction<any, any>
-  | BinaryExpressionOr<any, any>;
+export type WhereKind = BinaryExpression<any, any, any>;
 
 export interface Select<
   Params extends SelectKind,
@@ -311,7 +266,7 @@ export function escape(string: string): string {
 
 function* extractTableColumns(
   table: Table<any, any>
-): IterableIterator<ColumnLinked<any, any, any, any, any>> {
+): IterableIterator<ColumnLinkedAny> {
   for (const columnName of Object.getOwnPropertyNames(table)) {
     if (columnName === '*' || columnName === '$' || columnName === '$$') {
       continue;
@@ -320,13 +275,15 @@ function* extractTableColumns(
   }
 }
 
-const isColumnLinked = (
-  value: any
-): value is ColumnLinked<any, any, any, any, any> =>
+const isColumnLinked = (value: any): value is ColumnLinkedAny =>
   value && value.$ === JSQLType.COLUMN && value.kind === ColumnKind.LINKED;
 
 const isWhereKind = (value: any): value is WhereKind =>
-  value && value.kind && value.left && value.right;
+  value &&
+  value.kind &&
+  Object.values(BinaryExpressionKind).includes(value.kind) &&
+  value.left &&
+  value.right;
 
 const traverseExpressionTree = (
   tree: WhereKind,
@@ -535,7 +492,7 @@ jsql.as = <
 
 jsql.column = <
   ColumnName extends string,
-  DataType extends TypeClass,
+  DataType,
   DataDefaultable extends boolean | undefined,
   DataNullable extends boolean | undefined
 >(
@@ -551,7 +508,7 @@ jsql.column = <
 jsql.function = <
   FunctionName extends string,
   Args extends ColumnFree<any, any, any, any>,
-  Returns extends TypeClass
+  Returns
 >(
   functionName: FunctionName,
   functionArgs: Args[],
@@ -575,83 +532,22 @@ jsql.function = <
   return executor;
 };
 
-jsql.and = <Left, Right>(
+const binaryExpression = <Kind>(kind: Kind) => <Left, Right>(
   left: Left,
   right: Right
-): BinaryExpressionAnd<Left, Right> => ({
-  kind: BinaryExpressionKind.AND,
-  left,
-  right
-});
+): BinaryExpression<Kind, Left, Right> => ({ kind, left, right });
 
-jsql.or = <Left, Right>(
-  left: Left,
-  right: Right
-): BinaryExpressionOr<Left, Right> => ({
-  kind: BinaryExpressionKind.OR,
-  left,
-  right
-});
+jsql.and = binaryExpression(BinaryExpressionKind.AND);
 
-jsql.equalTo = <Column extends ColumnLinked<any, any, any, any, any>>(
-  column: Column,
-  value: NullableColumnType<Column>
-): BinaryExpressionEquality<Column, NullableColumnType<Column>> => ({
-  kind: BinaryExpressionKind.EQUALITY,
-  left: column,
-  right: value
-});
+jsql.or = binaryExpression(BinaryExpressionKind.OR);
 
-jsql.greaterThan = <Column extends ColumnLinked<any, any, any, any, any>>(
-  column: Column,
-  value:
-    | NullableColumnType<Column>
-    | BinaryExpressionSubtraction<
-        NullableColumnType<Column>,
-        NullableColumnType<Column>
-      >
-): BinaryExpressionGreaterThan<
-  Column,
-  | NullableColumnType<Column>
-  | BinaryExpressionSubtraction<
-      NullableColumnType<Column>,
-      NullableColumnType<Column>
-    >
-> => ({
-  kind: BinaryExpressionKind.GREATER_THAN,
-  left: column,
-  right: value
-});
+jsql.equalTo = binaryExpression(BinaryExpressionKind.EQUALITY);
 
-jsql.lessThan = <Column extends ColumnLinked<any, any, any, any, any>>(
-  column: Column,
-  value:
-    | NullableColumnType<Column>
-    | BinaryExpressionSubtraction<
-        NullableColumnType<Column>,
-        NullableColumnType<Column>
-      >
-): BinaryExpressionLessThan<
-  Column,
-  | NullableColumnType<Column>
-  | BinaryExpressionSubtraction<
-      NullableColumnType<Column>,
-      NullableColumnType<Column>
-    >
-> => ({
-  kind: BinaryExpressionKind.LESS_THAN,
-  left: column,
-  right: value
-});
+jsql.greaterThan = binaryExpression(BinaryExpressionKind.GREATER_THAN);
 
-jsql.subtraction = <X>(
-  left: X,
-  right: X
-): BinaryExpressionSubtraction<X, X> => ({
-  kind: BinaryExpressionKind.SUBTRACTION,
-  left,
-  right
-});
+jsql.lessThan = binaryExpression(BinaryExpressionKind.LESS_THAN);
+
+jsql.subtraction = binaryExpression(BinaryExpressionKind.SUBTRACTION);
 
 jsql.select = <
   Params extends SelectKind,
