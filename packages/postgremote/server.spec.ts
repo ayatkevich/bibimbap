@@ -7,19 +7,12 @@ import jwt from 'jsonwebtoken';
 import { setup, teardown } from './server';
 import { jsql, escapeId } from './jsql';
 
-const connectionParams = {
-  user: process.env.POSTGRES_USER,
-  host: 'localhost',
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD
-};
-
 describe('postgremote server', () => {
   let pool: Pool;
   let app: Application;
 
   beforeAll(() => {
-    pool = new Pool(connectionParams);
+    pool = new Pool();
   });
 
   afterAll(async () => {
@@ -450,7 +443,7 @@ describe('postgremote server', () => {
       await setup({
         secret: 'oops',
         // @ts-ignore
-        defaultRole: process.env.POSTGRES_USER,
+        defaultRole: process.env.PGUSER,
         tokenType: ''
       });
     } catch (error) {
@@ -467,7 +460,7 @@ describe('postgremote server', () => {
       await setup({
         secret: 'oops',
         // @ts-ignore
-        defaultRole: process.env.POSTGRES_USER,
+        defaultRole: process.env.PGUSER,
         tokenType: 'there is no such a token type'
       });
     } catch (error) {

@@ -4,12 +4,6 @@ import { Request, Response } from 'express';
 import { jsql, Query, escapeId } from './jsql';
 import { verify } from 'jsonwebtoken';
 
-const connectionParams = {
-  user: process.env.POSTGRES_USER,
-  host: 'localhost',
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD
-};
 let pool: Pool;
 
 export class PostgremoteError extends Error {
@@ -76,7 +70,7 @@ async function assertSettingsAndFetchTokenTypeID(
 }
 
 export async function setup(settings: PostgremoteSettings) {
-  pool = new Pool(connectionParams);
+  pool = new Pool();
 
   const tokenTypeID = await assertSettingsAndFetchTokenTypeID(pool, settings);
 

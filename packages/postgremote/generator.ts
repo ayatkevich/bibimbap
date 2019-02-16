@@ -3,12 +3,7 @@ import prettier from 'prettier';
 import { Client } from 'pg';
 
 export async function generator(schemas: string[]) {
-  const client = new Client({
-    user: process.env.POSTGRES_USER,
-    host: 'localhost',
-    database: process.env.POSTGRES_DB,
-    password: process.env.POSTGRES_PASSWORD
-  });
+  const client = new Client();
 
   await client.connect();
 

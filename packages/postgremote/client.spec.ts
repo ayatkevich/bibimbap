@@ -8,16 +8,13 @@ import { config, databaseConnectionPool, exec, serverEndpoint } from './client';
 import { escapeId, jsql } from './jsql';
 import { setup, teardown } from './server';
 
+console.log(process.env.PGUSER)
+
 describe(`postgremote client pool`, () => {
   let pool: Pool;
 
   beforeAll(async () => {
-    pool = new Pool({
-      user: process.env.POSTGRES_USER,
-      host: 'localhost',
-      database: process.env.POSTGRES_DB,
-      password: process.env.POSTGRES_PASSWORD
-    });
+    pool = new Pool();
   });
 
   afterAll(async () => {
@@ -55,7 +52,7 @@ describe(`postgremote client pool`, () => {
 
     expect(result).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ rolname: process.env.POSTGRES_USER })
+        expect.objectContaining({ rolname: process.env.PGUSER })
       ])
     );
   });
@@ -102,7 +99,7 @@ describe(`postgremote client pool`, () => {
 
       const app = express();
       server = (await new Promise(
-        resolve => (server = app.listen(0, () => resolve(server)))
+        resolve => (server = app.listen(() => resolve(server)))
       )) as Server;
       port = (server.address() as AddressInfo).port;
       app.use(cookieParser());
@@ -144,7 +141,7 @@ describe(`postgremote client pool`, () => {
 
       expect(result).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ rolname: process.env.POSTGRES_USER })
+          expect.objectContaining({ rolname: process.env.PGUSER })
         ])
       );
     });
