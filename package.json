@@ -2,8 +2,8 @@
   "private": true,
   "description": "Bibimbap — is my favorite Korean dish. It is a warm steamed white rice on the bottom of a bowl, and namul (sautéed and seasoned vegetables), gochujang (hot pepper soybean paste), and sesame oil over the rice. You have to mix it well with a spoon just before eating.",
   "scripts": {
-    "test": "POSTGRES_USER=postgremote POSTGRES_DB=postgremote POSTGRES_PASSWORD= jest --watchAll --coverage --verbose false -i",
-    "db": "PGUSER=postgremote PGDATABASE=postgremote PGPASSWORD= psql"
+    "test": "npx dotenv-cli jest --watchAll --coverage --verbose false -i",
+    "db": "npx dotenv-cli psql"
   },
   "repository": {
     "type": "git",
@@ -18,25 +18,29 @@
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
     "@types/cookie-parser": "^1.4.1",
-    "@types/express": "^4.16.0",
-    "@types/jest": "^23.3.10",
+    "@types/express": "^4.16.1",
+    "@types/jest": "^23.3.14",
     "@types/jsonwebtoken": "^8.3.0",
-    "@types/node": "^10.12.10",
-    "@types/pg": "^7.4.11",
-    "@types/prettier": "^1.15.2",
-    "@types/react": "^16.7.9",
-    "@types/sqlstring": "^2.2.0",
-    "@types/superagent": "^3.8.4",
-    "@types/supertest": "^2.0.6",
+    "@types/node": "^10.12.26",
+    "@types/pg": "^7.4.13",
+    "@types/prettier": "^1.16.1",
+    "@types/react": "^16.8.3",
+    "@types/sqlstring": "^2.2.1",
+    "@types/superagent": "^3.8.6",
+    "@types/supertest": "^2.0.7",
+    "dotenv": "^6.2.0",
+    "dotenv-expand": "^4.2.0",
+    "globby": "^8.0.2",
     "jest": "^23.6.0",
-    "lerna": "^3.5.1",
-    "prettier": "^1.15.2",
-    "supertest": "^3.3.0",
+    "lerna": "^3.13.0",
+    "prettier": "^1.16.4",
+    "supertest": "^3.4.2",
     "ts-jest": "^23.10.5",
-    "tslint": "^5.11.0",
-    "typescript": "^3.2.1"
+    "tslint": "^5.12.1",
+    "typescript": "^3.3.3"
   },
   "prettier": {
     "singleQuote": true
-  }
+  },
+  "jest": {}
 }
