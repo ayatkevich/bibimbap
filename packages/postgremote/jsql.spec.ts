@@ -189,12 +189,31 @@ describe(`DSL`, () => {
     });
 
     test(`select "User"."name" from "User"
-        where (
-          ("User"."email" = $1) and (
-            ("User"."createdTime" > (current_timestamp - cast($2 as interval))) or
-            ("User"."modifiedTime" < (current_timestamp - cast($3 as interval)))
-          )
-        ) or ("User"."inactive" = $4)`, () => {
+          where (
+            (
+              (
+                "User"."email" = $1
+              ) and (
+                (
+                  "User"."createdTime" > (
+                    current_timestamp - cast($2 as interval)
+                  )
+                ) or (
+                  "User"."modifiedTime" < (
+                    current_timestamp - cast($3 as interval)
+                  )
+                )
+              )
+            ) or (
+              (
+                "User"."rating" >= $4
+              ) or (
+                "User"."rating" <= $5
+              )
+            )
+          ) or (
+            "User"."inactive" = $6
+          )`, () => {
       const User = jsql.table('User', [
         jsql.column('name', { type: String }),
         jsql.column('email', { type: String }),
