@@ -162,7 +162,7 @@ export type FromKind = Table<any, any>;
 export const BinaryExpressionKind = {
   AND: ' and ',
   OR: ' or ',
-  EQUALITY: ' = ',
+  EQUAL_TO: ' = ',
   GREATER_THAN: ' > ',
   GREATER_THAN_OR_EQUAL_TO: ' >= ',
   LESS_THAN: ' < ',
@@ -543,7 +543,7 @@ jsql.and = binaryExpression(BinaryExpressionKind.AND);
 
 jsql.or = binaryExpression(BinaryExpressionKind.OR);
 
-jsql.equalTo = binaryExpression(BinaryExpressionKind.EQUALITY);
+jsql.equalTo = binaryExpression(BinaryExpressionKind.EQUAL_TO);
 
 jsql.greaterThan = binaryExpression(BinaryExpressionKind.GREATER_THAN);
 
