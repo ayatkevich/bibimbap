@@ -19,16 +19,10 @@ const TestTable0 = jsql.table('TestTable', [
 ]);
 
 // $ExpectError
-jsql.insert(TestTable0, {
-  // here should be a required column, because it neither have default value
-  // nor can have a null as a value
-});
+jsql.insert(TestTable0, {});
 
 // $ExpectError
-jsql.insert(TestTable0, {
-  // the same, should be required column
-  isNullable: false
-});
+jsql.insert(TestTable0, { isNullable: false });
 
 jsql.insert(TestTable0, {
   required: 'this field is required'
@@ -76,15 +70,20 @@ oneArgRequiredTwoOptional({});
 
 oneArgRequiredTwoOptional({ arg: 'string' });
 
-// $ExpectError
-oneArgRequiredTwoOptional({ arg: 1 });
+oneArgRequiredTwoOptional({
+  // $ExpectError
+  arg: 1
+});
 oneArgRequiredTwoOptional({
   arg: '',
   // $ExpectError
   defaultable: 'string instead of boolean'
 });
-// $ExpectError
-oneArgRequiredTwoOptional({ arg: '', nullable: 'string instead of number' });
+oneArgRequiredTwoOptional({
+  arg: '',
+  // $ExpectError
+  nullable: 'string instead of number'
+});
 
 /**
  * Select tests
