@@ -1,9 +1,6 @@
 Security:
   ☐ test sql injection
 
-Chores:
-  ☐ use tsconfig for typings tests
-
 PostgreMote:
   ☐ implement an SQL-like DSL
     ✔ change all operands to lower case to follow the sql formatting style @done
@@ -53,7 +50,7 @@ PostgreMote:
   ☐ implement database management interface that simplifies working with migrations and code coverage
 
 Bundler:
-  ☐ implement bibimbap's own bundler (yeah, I know this is probably too much, but another bundler are too slow)
+  ☐ use webpack to create bibimbap's specific configuration
 
 Create Bibimbap App:
   ☐ add @bibimbap/create package
@@ -63,7 +60,6 @@ DesignPad:
   ✔ implement .design.ts file format library for declaring frames to render @done
   ☐ build out runner that starts bundler and puppeteer and collects all the .design.ts files
   ☐ implement main app that renders frames one next to another
-  ☐ implement navigation between frames using arrows
   ☐ make puppeteer split all the frames between maximum amount of openned tabs
   ☐ make a screenshot of each frame on bundler change
   ☐ compare new screenshot with previous version
