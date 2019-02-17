@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "baseUrl": "./packages",
+    "baseUrl": "../../packages",
     "declaration": false,
     "noEmit": true,
     "downlevelIteration": true,
@@ -27,6 +27,6 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "target": "esnext",
-    "types": ["jest", "node"]
+    "types": []
   }
 }

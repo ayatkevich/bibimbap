@@ -18,11 +18,13 @@ const TestTable0 = jsql.table('TestTable', [
   jsql.column('required', { type: String })
 ]);
 
+// $ExpectError
 jsql.insert(TestTable0, {
   // here should be a required column, because it neither have default value
   // nor can have a null as a value
 });
 
+// $ExpectError
 jsql.insert(TestTable0, {
   // the same, should be required column
   isNullable: false
@@ -64,24 +66,24 @@ const oneArgRequiredTwoOptional = jsql.function(
   String
 );
 
-// wrong no args call
+// $ExpectError
 noArgs();
 
 noArgs({});
 
-// here too for the same reason as above
+// $ExpectError
 oneArgRequiredTwoOptional({});
 
 oneArgRequiredTwoOptional({ arg: 'string' });
 
-// wrong type of arg
+// $ExpectError
 oneArgRequiredTwoOptional({ arg: 1 });
-// wrong type of arg
 oneArgRequiredTwoOptional({
   arg: '',
+  // $ExpectError
   defaultable: 'string instead of boolean'
 });
-// wrong type of arg
+// $ExpectError
 oneArgRequiredTwoOptional({ arg: '', nullable: 'string instead of number' });
 
 /**

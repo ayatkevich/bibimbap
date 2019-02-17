@@ -16,9 +16,9 @@ import { jsql } from 'postgremote/jsql';
   )) {
     row.c1;
 
-    // here should be error
+    // $ExpectError
     row.c2;
-    // here should be error
+    // $ExpectError
     row.thereIsNoSuchAColumnHere;
   }
 
@@ -28,7 +28,7 @@ import { jsql } from 'postgremote/jsql';
     row.c1;
     row.c2;
 
-    // here should be error
+    // $ExpectError
     row.thereIsNoSuchAColumnHere;
   }
 
@@ -41,7 +41,7 @@ import { jsql } from 'postgremote/jsql';
     row.c2;
     row.c3;
 
-    // here should be error
+    // $ExpectError
     row.thereIsNoSuchAColumnHere;
   }
 
