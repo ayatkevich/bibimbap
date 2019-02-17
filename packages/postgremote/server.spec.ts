@@ -31,8 +31,14 @@ describe('postgremote server', () => {
       await client.query(`revoke select
         on all tables in schema pg_catalog
         from public`);
-      await client.query(`create type ${escapeId(tokenType)} as ( sub text )`);
-      await client.query(`create role ${escapeId(defaultRole)}`);
+      try {
+        await client.query(
+          `create type ${escapeId(tokenType)} as ( sub text )`
+        );
+      } catch (err) {}
+      try {
+        await client.query(`create role ${escapeId(defaultRole)}`);
+      } catch (err) {}
     } finally {
       client.release();
     }
