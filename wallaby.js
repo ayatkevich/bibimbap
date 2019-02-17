@@ -1,3 +1,6 @@
+const { Client } = require('pg');
+require('dotenv').config();
+
 module.exports = function(wallaby) {
   var path = require('path');
   process.env.NODE_PATH +=
@@ -47,6 +50,25 @@ module.exports = function(wallaby) {
           }, {});
       }
       wallaby.testFramework.configure(jestConfig);
+    },
+
+    teardown: async function(w) {
+      const client = new Client();
+      try {
+        await client.connect();
+  
+        const res = await client.query(
+          `
+            select pg_terminate_backend(pg_stat_activity.pid)
+            from pg_stat_activity
+            where pg_stat_activity.datname = $1
+              and pid <> pg_backend_pid()
+          `,
+          [process.env.PGDATABASE]
+        );
+      } finally {
+        await client.end();
+      }
     }
   };
 };
