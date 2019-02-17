@@ -200,7 +200,8 @@ describe(`DSL`, () => {
         jsql.column('email', { type: String }),
         jsql.column('createdTime', { type: Timestamp }),
         jsql.column('modifiedTime', { type: Timestamp }),
-        jsql.column('inactive', { type: Boolean })
+        jsql.column('inactive', { type: Boolean }),
+        jsql.column('rating', { type: Number })
       ]);
 
       const yesterday = jsql.subtraction(
@@ -213,11 +214,17 @@ describe(`DSL`, () => {
           .select([User.name], {
             from: [User],
             where: jsql.or(
-              jsql.and(
-                jsql.equalTo(User.email, 'name@example.com'),
+              jsql.or(
+                jsql.and(
+                  jsql.equalTo(User.email, 'name@example.com'),
+                  jsql.or(
+                    jsql.greaterThan(User.createdTime, yesterday),
+                    jsql.lessThan(User.modifiedTime, yesterday)
+                  )
+                ),
                 jsql.or(
-                  jsql.greaterThan(User.createdTime, yesterday),
-                  jsql.lessThan(User.modifiedTime, yesterday)
+                  jsql.greaterThanOrEqualTo(User.rating, 3),
+                  jsql.lessThanOrEqualTo(User.rating, 5)
                 )
               ),
               jsql.equalTo(User.inactive, true)
@@ -227,12 +234,31 @@ describe(`DSL`, () => {
       ).toEqual({
         text: removeSpaces(`select "User"."name" from "User"
           where (
-            ("User"."email" = $1) and (
-              ("User"."createdTime" > (current_timestamp - cast($2 as interval))) or
-              ("User"."modifiedTime" < (current_timestamp - cast($3 as interval)))
+            (
+              (
+                "User"."email" = $1
+              ) and (
+                (
+                  "User"."createdTime" > (
+                    current_timestamp - cast($2 as interval)
+                  )
+                ) or (
+                  "User"."modifiedTime" < (
+                    current_timestamp - cast($3 as interval)
+                  )
+                )
+              )
+            ) or (
+              (
+                "User"."rating" >= $4
+              ) or (
+                "User"."rating" <= $5
+              )
             )
-          ) or ("User"."inactive" = $4)`),
-        values: ['name@example.com', '1 day', '1 day', true]
+          ) or (
+            "User"."inactive" = $6
+          )`),
+        values: ['name@example.com', '1 day', '1 day', 3, 5, true]
       });
     });
   });

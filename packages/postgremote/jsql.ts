@@ -164,7 +164,9 @@ export const BinaryExpressionKind = {
   OR: ' or ',
   EQUALITY: ' = ',
   GREATER_THAN: ' > ',
+  GREATER_THAN_OR_EQUAL_TO: ' >= ',
   LESS_THAN: ' < ',
+  LESS_THAN_OR_EQUAL_TO: ' <= ',
   SUBTRACTION: ' - '
 };
 
@@ -546,6 +548,14 @@ jsql.equalTo = binaryExpression(BinaryExpressionKind.EQUALITY);
 jsql.greaterThan = binaryExpression(BinaryExpressionKind.GREATER_THAN);
 
 jsql.lessThan = binaryExpression(BinaryExpressionKind.LESS_THAN);
+
+jsql.greaterThanOrEqualTo = binaryExpression(
+  BinaryExpressionKind.GREATER_THAN_OR_EQUAL_TO
+);
+
+jsql.lessThanOrEqualTo = binaryExpression(
+  BinaryExpressionKind.LESS_THAN_OR_EQUAL_TO
+);
 
 jsql.subtraction = binaryExpression(BinaryExpressionKind.SUBTRACTION);
 
