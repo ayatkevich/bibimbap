@@ -30,6 +30,10 @@ module.exports = function(wallaby) {
 
     testFramework: 'jest',
 
+    workers: {
+      restart: true
+    },
+
     setup: function(w) {
       require('dotenv').config();
 
