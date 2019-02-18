@@ -280,6 +280,38 @@ describe(`DSL`, () => {
         values: ['name@example.com', '1 day', '1 day', 3, 5, true]
       });
     });
+
+    test(``, () => {
+      const Calc = jsql.table('Calc', [
+        jsql.column('x', { type: Number }),
+        jsql.column('y', { type: Number })
+      ]);
+
+      expect(
+        jsql.select([Calc['*']], {
+          from: [Calc],
+          where: jsql.and(
+            jsql.or(
+              jsql.equalTo(jsql.addition(Calc.x, Calc.y), 10),
+              jsql.equalTo(jsql.multiplication(Calc.x, Calc.y), 50)
+            ),
+            jsql.equalTo(jsql.division(Calc.x, Calc.y), 5)
+          )
+        }).toQueryObject()
+      ).toEqual({
+        text: removeSpaces(`select "Calc".* from "Calc"
+          where (
+            (
+              ("Calc"."x" + "Calc"."y") = $1
+            ) or (
+              ("Calc"."x" * "Calc"."y") = $2
+            )
+          ) and (
+            ("Calc"."x" / "Calc"."y") = $3
+          )`),
+        values: [10, 50, 5]
+      });
+    });
   });
 
   describe(`insert`, () => {

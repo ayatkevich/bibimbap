@@ -167,7 +167,10 @@ export const BinaryExpressionKind = {
   GREATER_THAN_OR_EQUAL_TO: ' >= ',
   LESS_THAN: ' < ',
   LESS_THAN_OR_EQUAL_TO: ' <= ',
-  SUBTRACTION: ' - '
+  SUBTRACTION: ' - ',
+  ADDITION: ' + ',
+  DIVISION: ' / ',
+  MULTIPLICATION: ' * '
 };
 
 export type BinaryExpression<Kind, Left, Right> = {
@@ -558,6 +561,12 @@ jsql.lessThanOrEqualTo = binaryExpression(
 );
 
 jsql.subtraction = binaryExpression(BinaryExpressionKind.SUBTRACTION);
+
+jsql.addition = binaryExpression(BinaryExpressionKind.ADDITION);
+
+jsql.multiplication = binaryExpression(BinaryExpressionKind.MULTIPLICATION);
+
+jsql.division = binaryExpression(BinaryExpressionKind.DIVISION);
 
 jsql.select = <
   Params extends SelectKind,
