@@ -7,9 +7,6 @@ import { Pool } from 'pg';
 import { config, databaseConnectionPool, exec, serverEndpoint } from './client';
 import { escapeId, jsql } from './jsql';
 import { setup, teardown } from './server';
-
-console.log(process.env.PGUSER)
-
 describe(`postgremote client pool`, () => {
   let pool: Pool;
 
@@ -69,9 +66,11 @@ describe(`postgremote client pool`, () => {
     const setupTestEnvironment = async () => {
       const client = await pool.connect();
       try {
-        await client.query(
-          `create type ${escapeId(tokenType)} as ( sub text )`
-        );
+        try {
+          await client.query(
+            `create type ${escapeId(tokenType)} as ( sub text )`
+          );
+        } catch (err) {}
         await client.query(`create role ${escapeId(defaultRole)}`);
         await client.query(`grant select
           on all tables in schema pg_catalog
