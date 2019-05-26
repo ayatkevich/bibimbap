@@ -11,28 +11,28 @@ PostgreMote:
     ✔ implement jsql.and binary expression function @done
     ✔ implement jsql.or binary expression function @done
     ✔ simplify binary expressions @done
-    ☐ implement jsql.not expression function
     ✔ implement jsql.greaterThan binary expression function @done
     ✔ implement jsql.lessThan binary expression function @done
     ✔ implement jsql.greatThanOrEqualTo binary expression function @done
     ✔ implement jsql.lessThanOrEqualTo binary expression function @done
-    ☐ implement jsql.notEqual binary expression function
-    ☐ implement jsql.addition binary expression function
+    ✔ implement jsql.addition binary expression function @done
     ✔ implement jsql.subtraction binary expression function @done
-    ☐ implement jsql.multiplication binary expression function
-    ☐ implement jsql.division binary expression function
+    ✔ implement jsql.multiplication binary expression function @done
+    ✔ implement jsql.division binary expression function @done
+    ☐ implement jsql.notEqual binary expression function
+    ☐ implement jsql.bitwiseAnd binary expression function
+    ☐ implement jsql.bitwiseOr binary expression function
+    ☐ implement jsql.bitwiseXor binary expression function
+    ☐ implement jsql.bitwiseShiftLeft binary expression function
+    ☐ implement jsql.bitwiseShiftRight binary expression function
     ☐ implement jsql.modulo binary expression function
     ☐ implement jsql.exponentiation binary expression function
+    ☐ implement jsql.not expression function
     ☐ implement jsql.squareRoot expression function
     ☐ implement jsql.cubeRoot expression function
     ☐ implement jsql.factorial expression function
     ☐ implement jsql.absoluteValue expression function
-    ☐ implement jsql.bitwiseAnd binary expression function
-    ☐ implement jsql.bitwiseOr binary expression function
-    ☐ implement jsql.bitwiseXor binary expression function
     ☐ implement jsql.bitwiseNot expression function
-    ☐ implement jsql.bitwiseShiftLeft binary expression function
-    ☐ implement jsql.bitwiseShiftRight binary expression function
     ☐ add joins
     ☐ add subqueries
     ☐ improve jsql with runtime guards
