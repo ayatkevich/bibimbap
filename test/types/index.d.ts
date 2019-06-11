@@ -1,3 +1,3 @@
-// TypeScript Version: 3.3
+// TypeScript Version: 3.5
 
 export function nothing(): void;
