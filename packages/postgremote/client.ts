@@ -59,8 +59,8 @@ type UnpackedColumns<Query extends JSQLQuery>
 
 type QueryResultType<Columns> = {
   [Key in ColumnName<Columns>]: InstanceType<
-    NamedColumn<Key, Columns>['columnSettings']['type']
-  >
+    NamedColumn<Key, Columns>['dataType']
+  >;
 };
 
 export async function exec<Query extends JSQLQuery>(

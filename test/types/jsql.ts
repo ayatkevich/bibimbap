@@ -5,17 +5,10 @@ import { jsql } from 'postgremote/jsql';
  */
 
 const TestTable0 = jsql.table('TestTable', [
-  jsql.column('isNullable', { type: Boolean, nullable: true }),
-  jsql.column('withDefault', {
-    type: Number,
-    defaultable: true
-  }),
-  jsql.column('withDefaultAndNullable', {
-    type: String,
-    defaultable: true,
-    nullable: true
-  }),
-  jsql.column('required', { type: String })
+  jsql.column('isNullable', Boolean, false, true),
+  jsql.column('withDefault', Number, true, false),
+  jsql.column('withDefaultAndNullable', String, true, true),
+  jsql.column('required', String)
 ]);
 
 // $ExpectError
@@ -53,9 +46,9 @@ const noArgs = jsql.function('noArgs', [], Boolean);
 const oneArgRequiredTwoOptional = jsql.function(
   'oneArg',
   [
-    jsql.column('arg', { type: String }),
-    jsql.column('nullable', { type: Number, nullable: true }),
-    jsql.column('defaultable', { type: Boolean, defaultable: true })
+    jsql.column('arg', String),
+    jsql.column('nullable', Number, false, true),
+    jsql.column('defaultable', Boolean, true, false)
   ],
   String
 );

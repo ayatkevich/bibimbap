@@ -3,12 +3,12 @@ import { jsql } from 'postgremote/jsql';
 
 (async () => {
   const MyTable1 = jsql.table('MyTable1', [
-    jsql.column('c1', { type: String }),
-    jsql.column('c2', { type: Number })
+    jsql.column('c1', String),
+    jsql.column('c2', Number)
   ]);
   const MyTable2 = jsql.table('MyTable2', [
-    jsql.column('d1', { type: Boolean }),
-    jsql.column('d2', { type: String })
+    jsql.column('d1', Boolean),
+    jsql.column('d2', String)
   ]);
 
   for (const row of await exec(

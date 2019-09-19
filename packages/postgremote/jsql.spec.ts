@@ -59,8 +59,8 @@ describe(`DSL`, () => {
       const login = jsql.function(
         'login',
         [
-          jsql.column('username', { type: String }),
-          jsql.column('password', { type: String, defaultable: true })
+          jsql.column('username', String),
+          jsql.column('password', String, true)
         ],
         Boolean
       );
@@ -101,7 +101,7 @@ describe(`DSL`, () => {
 
     it(`should setup from, otherwise throw error`, () => {
       const TableName = jsql.table('TableName', [
-        jsql.column('column', { type: String })
+        jsql.column('column', String)
       ]);
 
       expect(() => {
@@ -112,7 +112,7 @@ describe(`DSL`, () => {
 
     it(`should not allow use select expression without from statement`, () => {
       const TableName = jsql.table('TableName', [
-        jsql.column('column', { type: String })
+        jsql.column('column', String)
       ]);
 
       expect(() => {
@@ -128,7 +128,7 @@ describe(`DSL`, () => {
 
     test(`select "TableName".* from "TableName"`, () => {
       const TableName = jsql.table('TableName', [
-        jsql.column('column', { type: String })
+        jsql.column('column', String)
       ]);
 
       expect(
@@ -160,8 +160,8 @@ describe(`DSL`, () => {
 
     test(`select "User"."username" as "firstName", "User"."lastName" from "User"`, () => {
       const User = jsql.table('User', [
-        jsql.column('username', { type: String }),
-        jsql.column('lastName', { type: String })
+        jsql.column('username', String),
+        jsql.column('lastName', String)
       ]);
 
       expect(
@@ -177,8 +177,8 @@ describe(`DSL`, () => {
     });
 
     test(`select "T1"."a", "T2"."b" from "T1", "T2"`, () => {
-      const T1 = jsql.table('T1', [jsql.column('a', { type: String })]);
-      const T2 = jsql.table('T2', [jsql.column('b', { type: String })]);
+      const T1 = jsql.table('T1', [jsql.column('a', String)]);
+      const T2 = jsql.table('T2', [jsql.column('b', String)]);
 
       expect(
         jsql.select([T1.a, T2.b], { from: [T1, T2] }).toQueryObject()
@@ -215,12 +215,12 @@ describe(`DSL`, () => {
             "User"."inactive" = $6
           )`, () => {
       const User = jsql.table('User', [
-        jsql.column('name', { type: String }),
-        jsql.column('email', { type: String }),
-        jsql.column('createdTime', { type: Timestamp }),
-        jsql.column('modifiedTime', { type: Timestamp }),
-        jsql.column('inactive', { type: Boolean }),
-        jsql.column('rating', { type: Number })
+        jsql.column('name', String),
+        jsql.column('email', String),
+        jsql.column('createdTime', Timestamp),
+        jsql.column('modifiedTime', Timestamp),
+        jsql.column('inactive', Boolean),
+        jsql.column('rating', Number)
       ]);
 
       const yesterday = jsql.subtraction(
@@ -283,21 +283,23 @@ describe(`DSL`, () => {
 
     test(``, () => {
       const Calc = jsql.table('Calc', [
-        jsql.column('x', { type: Number }),
-        jsql.column('y', { type: Number })
+        jsql.column('x', Number),
+        jsql.column('y', Number)
       ]);
 
       expect(
-        jsql.select([Calc['*']], {
-          from: [Calc],
-          where: jsql.and(
-            jsql.or(
-              jsql.equalTo(jsql.addition(Calc.x, Calc.y), 10),
-              jsql.equalTo(jsql.multiplication(Calc.x, Calc.y), 50)
-            ),
-            jsql.equalTo(jsql.division(Calc.x, Calc.y), 5)
-          )
-        }).toQueryObject()
+        jsql
+          .select([Calc['*']], {
+            from: [Calc],
+            where: jsql.and(
+              jsql.or(
+                jsql.equalTo(jsql.addition(Calc.x, Calc.y), 10),
+                jsql.equalTo(jsql.multiplication(Calc.x, Calc.y), 50)
+              ),
+              jsql.equalTo(jsql.division(Calc.x, Calc.y), 5)
+            )
+          })
+          .toQueryObject()
       ).toEqual({
         text: removeSpaces(`select "Calc".* from "Calc"
           where (
@@ -317,8 +319,8 @@ describe(`DSL`, () => {
   describe(`insert`, () => {
     test(`insert into "User" ("firstName", "lastName") values ($1, $2)`, () => {
       const User = jsql.table('User', [
-        jsql.column('firstName', { type: String }),
-        jsql.column('lastName', { type: String })
+        jsql.column('firstName', String),
+        jsql.column('lastName', String)
       ]);
 
       expect(
@@ -337,7 +339,7 @@ describe(`DSL`, () => {
     it(`should throw an error if you try to insert a value
         for a column that does not exist`, () => {
       const TestTable = jsql.table('TestTable', [
-        jsql.column('testColumn', { type: String })
+        jsql.column('testColumn', String)
       ]);
       expect(() => {
         jsql
@@ -351,7 +353,7 @@ describe(`DSL`, () => {
 
     it(`should not allow you to create an insert with no columns`, () => {
       const TestTable = jsql.table('TestTable', [
-        jsql.column('testColumn', { type: String, nullable: true })
+        jsql.column('testColumn', String, false, true)
       ]);
       expect(() => {
         jsql.insert(TestTable, {}).toJSQL();

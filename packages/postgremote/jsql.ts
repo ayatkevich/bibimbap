@@ -6,16 +6,6 @@ enum JSQLType {
   FUNCTION
 }
 
-type ColumnSettings<
-  DataType,
-  DataDefaultable extends boolean | undefined,
-  DataNullable extends boolean | undefined
-> = {
-  type: DataType;
-  nullable?: DataNullable;
-  defaultable?: DataDefaultable;
-};
-
 enum ColumnKind {
   LINKED,
   FREE,
@@ -30,7 +20,9 @@ export type ColumnFree<
   $: JSQLType.COLUMN;
   kind: ColumnKind.FREE;
   columnName: ColumnName;
-  columnSettings: ColumnSettings<DataType, DataDefaultable, DataNullable>;
+  dataType: DataType;
+  dataDefaultable?: DataDefaultable;
+  dataNullable?: DataNullable;
 };
 
 export type ColumnLinked<
@@ -46,14 +38,16 @@ export type ColumnLinked<
   tableName: TableName;
   columnName: ColumnName;
   aliasName?: AliasName;
-  columnSettings: ColumnSettings<DataType, DataDefaultable, DataNullable>;
+  dataType: DataType;
+  dataDefaultable?: DataDefaultable,
+  dataNullable?: DataNullable;
 };
 
 type ColumnLinkedAny = ColumnLinked<any, any, any, any, any>;
 
 type ColumnType<
   Column extends ColumnFree<any, any, any, any> | ColumnLinkedAny
-> = InstanceType<Column['columnSettings']['type']>;
+> = InstanceType<Column['dataType']>;
 
 export type ColumnAsterisk<TableName extends string> = {
   $: JSQLType.COLUMN;
@@ -77,9 +71,9 @@ export type Table<
     [ColumnName in Columns['columnName']]: ColumnLinked<
       TableName,
       ColumnName,
-      NamedColumn<ColumnName, Columns>['columnSettings']['type'],
-      NamedColumn<ColumnName, Columns>['columnSettings']['defaultable'],
-      NamedColumn<ColumnName, Columns>['columnSettings']['nullable']
+      NamedColumn<ColumnName, Columns>['dataType'],
+      NamedColumn<ColumnName, Columns>['dataDefaultable'],
+      NamedColumn<ColumnName, Columns>['dataNullable']
     >
   };
 
@@ -456,15 +450,17 @@ jsql.table = <
     const columnLinked: ColumnLinked<
       TableName,
       Columns['columnName'],
-      Columns['columnSettings']['type'],
-      Columns['columnSettings']['defaultable'],
-      Columns['columnSettings']['nullable']
+      Columns['dataType'],
+      Columns['dataDefaultable'],
+      Columns['dataNullable']
     > = {
       $: JSQLType.COLUMN,
       kind: ColumnKind.LINKED,
       tableName: tableName,
       columnName: column.columnName,
-      columnSettings: column.columnSettings
+      dataType: column.dataType,
+      dataDefaultable: column.dataDefaultable,
+      dataNullable: column.dataNullable,
     };
     Object.defineProperty(result, column.columnName, {
       value: columnLinked,
@@ -486,9 +482,9 @@ jsql.as = <
 ): ColumnLinked<
   Column['tableName'],
   Column['columnName'],
-  Column['columnSettings']['type'],
-  Column['columnSettings']['defaultable'],
-  Column['columnSettings']['nullable'],
+  Column['dataType'],
+  Column['dataDefaultable'],
+  Column['dataNullable'],
   Alias
 > => ({
   ...columnLinked,
@@ -502,12 +498,16 @@ jsql.column = <
   DataNullable extends boolean | undefined
 >(
   columnName: ColumnName,
-  columnSettings: ColumnSettings<DataType, DataDefaultable, DataNullable>
+  dataType: DataType,
+  dataDefaultable?: DataDefaultable,
+  dataNullable?: DataNullable
 ): ColumnFree<ColumnName, DataType, DataDefaultable, DataNullable> => ({
   $: JSQLType.COLUMN,
   kind: ColumnKind.FREE,
   columnName: columnName,
-  columnSettings: columnSettings
+  dataType,
+  dataDefaultable,
+  dataNullable
 });
 
 jsql.function = <
@@ -520,7 +520,7 @@ jsql.function = <
   returnType: Returns
 ): StoredFunction<FunctionName, Args, Returns> => {
   const executor = ((args: PropertiesFromColumns<Args>) =>
-    new class ExecuteGenerator extends QueryGenerator<Execute> {
+    new (class ExecuteGenerator extends QueryGenerator<Execute> {
       toJSQL(): Execute {
         return {
           kind: QueryKind.EXECUTE,
@@ -530,7 +530,7 @@ jsql.function = <
           args
         };
       }
-    }()) as StoredFunction<FunctionName, Args, Returns>;
+    })()) as StoredFunction<FunctionName, Args, Returns>;
   executor.functionName = functionName;
   executor.functionArgs = functionArgs;
   executor.functionReturnType = returnType;
@@ -579,7 +579,7 @@ jsql.select = <
     where?: Where;
   }
 ) =>
-  new class SelectGenerator extends QueryGenerator<
+  new (class SelectGenerator extends QueryGenerator<
     Select<Params, From, Where>
   > {
     toJSQL(): Select<Params, From, Where> {
@@ -596,13 +596,13 @@ jsql.select = <
         where: clause.where
       };
     }
-  }();
+  })();
 
 jsql.insert = <Into extends Table<any, any>>(
   table: Into,
   values: TableProperties<Into>
 ) =>
-  new class InsertGenerator extends QueryGenerator<Insert<Into>> {
+  new (class InsertGenerator extends QueryGenerator<Insert<Into>> {
     toJSQL(): Insert<Into> {
       if (Object.getOwnPropertyNames(values).length === 0) {
         throw new JSQLError('You should pass at least one column');
@@ -615,7 +615,7 @@ jsql.insert = <Into extends Table<any, any>>(
         values
       };
     }
-  }();
+  })();
 
 enum TimestampKind {
   TIMESTAMP,
