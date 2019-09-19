@@ -51,6 +51,7 @@ PostgreMote:
 
 Bundler:
   ☐ use webpack to create bibimbap's specific configuration
+  ☐ or check if razzle can be used
 
 Create Bibimbap App:
   ☐ add @bibimbap/create package
@@ -64,7 +65,7 @@ DesignPad:
   ☐ make a screenshot of each frame on bundler change
   ☐ compare new screenshot with previous version
   ☐ warn main app with list of visual diffs
-  ☐ add ability to set visible frame as wip
+  ☐ add capability to set visible frame as wip
   ☐ automatically disable wip for frames that aren't visible
   ☐ exclude wip frames from snapshot comparison
   ☐ add capability to make screenshots using selenium driver and browserstack for cross-browser experience
@@ -79,6 +80,7 @@ Test runner:
   ☐ collect js coverage both in puppeteer and node test runner
   ☐ combine puppeteer and node test runner coverage reports
   ☐ notify user about uncovered parts of the code
+  ☐ add capability to add report rendering middleware for certain expectations
 
 UI state management:
   ☐ finite-state machine based store
@@ -88,6 +90,7 @@ UI state management:
 Business logic module:
   ☐ implement test-saga like module for redux-saga testing but with capability to render flowcharts based on them
   ☐ implement black-box testing of sagas
+  ☐ integrate with fsm
 
 Archive:
   ✔ add where clause @done @project(PostgreMote)
