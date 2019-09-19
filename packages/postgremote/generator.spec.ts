@@ -55,13 +55,13 @@ describe('jsql code generator', () => {
       expect(await generator([schema])).toMatchInlineSnapshot(`
 "import { jsql } from 'postgremote/jsql';
 export const Table1 = jsql.table('myOwnUniqueSchema.Table1', [
-  jsql.column('column0', { type: String, nullable: true, defaultable: true })
+  jsql.column('column0', String, true, true)
 ]);
 export const Table0 = jsql.table('myOwnUniqueSchema.Table0', [
-  jsql.column('column0', { type: String, nullable: false, defaultable: false })
+  jsql.column('column0', String, false, false)
 ]);
 export const Table2 = jsql.table('myOwnUniqueSchema.Table2', [
-  jsql.column('column0', { type: String, nullable: true, defaultable: false })
+  jsql.column('column0', String, false, true)
 ]);
 export const function1 = jsql.function(
   'myOwnUniqueSchema.function1',

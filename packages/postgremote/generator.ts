@@ -161,20 +161,9 @@ function prepareColumn(column: {
     undefined,
     [
       ts.createLiteral(column.columnName),
-      ts.createObjectLiteral([
-        ts.createPropertyAssignment(
-          ts.createIdentifier('type'),
-          ts.createIdentifier('String')
-        ),
-        ts.createPropertyAssignment(
-          ts.createIdentifier('nullable'),
-          ts.createIdentifier(String(!column.notNull))
-        ),
-        ts.createPropertyAssignment(
-          ts.createIdentifier('defaultable'),
-          ts.createIdentifier(String(column.hasDefaultValue))
-        )
-      ])
+      ts.createIdentifier('String'),
+      ts.createIdentifier(String(column.hasDefaultValue)),
+      ts.createIdentifier(String(!column.notNull))
     ]
   );
 }
