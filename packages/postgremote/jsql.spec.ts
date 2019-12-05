@@ -281,7 +281,16 @@ describe(`DSL`, () => {
       });
     });
 
-    test(``, () => {
+    test(`select "Calc".* from "Calc"
+          where (
+            (
+              ("Calc"."x" + "Calc"."y") = $1
+            ) or (
+              ("Calc"."x" * "Calc"."y") = $2
+            )
+          ) and (
+            ("Calc"."x" / "Calc"."y") = $3
+          )`, () => {
       const Calc = jsql.table('Calc', [
         jsql.column('x', Number),
         jsql.column('y', Number)
