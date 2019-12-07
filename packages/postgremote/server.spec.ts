@@ -112,8 +112,11 @@ describe('postgremote server', () => {
         expect(error).toBeFalsy();
         expect(body).toEqual([{ name: `hey what's up` }]);
       } finally {
-        await client.query(`drop table if exists ${escapeId(TestTable.$$)}`);
-        client.release();
+        try {
+          await client.query(`drop table if exists ${escapeId(TestTable.$$)}`);
+        } finally {
+          client.release();
+        }
       }
     });
 
@@ -146,8 +149,11 @@ describe('postgremote server', () => {
 
         expect(error.text).toMatch('permission denied');
       } finally {
-        await client.query(`drop table if exists ${escapeId(TestTable.$$)}`);
-        client.release();
+        try {
+          await client.query(`drop table if exists ${escapeId(TestTable.$$)}`);
+        } finally {
+          client.release();
+        }
       }
     });
 
@@ -215,10 +221,13 @@ describe('postgremote server', () => {
           .expect(403);
       } finally {
         // cleaning everything up
-        await client.query(`drop table if exists ${escapeId(TestTable.$$)}`);
-        await client.query(`drop role if exists ${escapeId(TestRoleTwo)}`);
-        await client.query(`drop role if exists ${escapeId(TestRoleOne)}`);
-        client.release();
+        try {
+          await client.query(`drop table if exists ${escapeId(TestTable.$$)}`);
+          await client.query(`drop role if exists ${escapeId(TestRoleTwo)}`);
+          await client.query(`drop role if exists ${escapeId(TestRoleOne)}`);
+        } finally {
+          client.release();
+        }
       }
     });
 
@@ -262,8 +271,11 @@ describe('postgremote server', () => {
         );
         expect(response.body).toBe(true);
       } finally {
-        await client.query(`drop function if exists login()`);
-        client.release();
+        try {
+          await client.query(`drop function if exists login()`);
+        } finally {
+          client.release();
+        }
       }
     });
 
@@ -337,8 +349,13 @@ describe('postgremote server', () => {
           .send(jsql.select([TestTable['*']], { from: [TestTable] }).toJSQL())
           .expect(200);
       } finally {
-        await client.query(`drop schema if exists ${escapeId(schema)} cascade`);
-        client.release();
+        try {
+          await client.query(
+            `drop schema if exists ${escapeId(schema)} cascade`
+          );
+        } finally {
+          client.release();
+        }
       }
     });
   });
