@@ -57,7 +57,7 @@ describe('postgremote server', () => {
     }
   };
 
-  describe('making a query using an API end point', async () => {
+  describe('making a query using an API end point', () => {
     beforeAll(async () => {
       await setupTestEnvironment();
 
@@ -343,7 +343,7 @@ describe('postgremote server', () => {
     });
   });
 
-  describe('error handling', async () => {
+  describe('error handling', () => {
     beforeAll(async () => {
       await setupTestEnvironment();
 
