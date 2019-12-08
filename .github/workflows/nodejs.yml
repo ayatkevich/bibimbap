@@ -38,5 +38,6 @@ jobs:
         CI: true
         PGUSER: postgres
         PGPASSWORD: postgres
+        PGDATABASE: bibimbap
         PGHOST: localhost
         PGPORT: ${{ job.services.postgres.ports[5432] }}
