@@ -20,6 +20,6 @@
     "jsonwebtoken": "^8.5.1",
     "pg": "^7.14.0",
     "sqlstring": "^2.3.1",
-    "superagent": "^5.1.2"
+    "superagent": "^5.2.2"
   }
 }
