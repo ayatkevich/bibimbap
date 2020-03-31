@@ -32,7 +32,7 @@
     "@types/supertest": "^2.0.8",
     "dotenv": "^8.2.0",
     "dotenv-expand": "^5.1.0",
-    "dtslint": "^2.0.2",
+    "dtslint": "^3.4.1",
     "globby": "^10.0.1",
     "jest": "^24.9.0",
     "lerna": "^3.19.0",
